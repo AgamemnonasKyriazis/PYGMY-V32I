@@ -6,7 +6,11 @@ OBJCOPY = riscv32-unknown-elf-objcopy
 TARGET = main
 
 # Default rule
-all: $(TARGET).bin
+all:    $(TARGET).bin;
+	@hexdump -v -e '"@%04_ax " 1/1 "%02x\n"' main.bin > readmemfmt.hex;
+	@python3 main.py > image.hex;
+	@rm readmemfmt.hex;
+	echo "DONE"
 
 # Rule to build the start.o file
 start.o: start.s
