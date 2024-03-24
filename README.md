@@ -20,3 +20,5 @@ TODO:
 * TCL scipts for bitstream generation through cmd.
 * Expandability (ability to include multiple peripherals).
 * GPIO interface.
+
+:smiley:
