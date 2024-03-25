@@ -21,5 +21,5 @@ TODO:
 * GPIO interface.
 * Further reduce size in LUTs and FF.
 
-![Alt text](./top.svg)
+![Alt text](top.svg)
 <img src="./PYGMY.svg">
