@@ -1,6 +1,6 @@
 # Pygmy
 
-Pygmy is a tiny RISC-V programmable **microcontroller** for embedded/FPGA applications designed entirely in Verilog HDL. Its initial use case is to replace complex state machines and to perform house-keeping operations in large systems that need a flexible master controller.
+Pygmy is a tiny 2-stage pipelined RISC-V programmable **microcontroller** for embedded/FPGA applications designed entirely in Verilog HDL. Its initial use case is to replace complex state machines and to perform house-keeping operations in large systems that need a flexible master controller.
 
 * Go to [sw] directory and hit make clean/make all.
 * Got to [rtl] directory and hit make clean/make all.
@@ -20,3 +20,6 @@ TODO:
 * Expandability (ability to include multiple peripherals).
 * GPIO interface.
 * Further reduce size in LUTs and FF.
+
+![Alt text](./top.svg)
+<img src="./PYGMY.svg">
