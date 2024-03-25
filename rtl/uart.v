@@ -159,7 +159,7 @@ always @(posedge tx_clk, negedge rst_ni) begin: TxSyncStateMachine
         case(tx_state)
         TX_IDLE : begin
             tx_frame_count <= 'b0;
-            $display("%x", tx_fifo_data_o);
+            $display("%c", tx_fifo_data_o);
             tx_frame_buf <= {tx_fifo_data_o, 1'b0};
             tx <= 'b1;
         end

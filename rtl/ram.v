@@ -1,4 +1,6 @@
-module mem(
+`timescale 1ns / 1ps
+
+module ram(
     /* system clock */
     input wire clk_i,
     /* system reset */

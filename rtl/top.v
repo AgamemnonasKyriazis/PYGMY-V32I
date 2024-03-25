@@ -124,13 +124,15 @@ execute e0 (
 );
 
 rom rom0 (
+    /* address bus */
     .addr_i(bus_addr),
-    .cs_i(rom_cs),
+    /* half-word/byte */
     .hb_i(bus_hb),
+    /* data bus out */
     .rdata_o(rom_data)
 );
 
-mem mem0 (
+ram ram0 (
     .clk_i(sysclk),
     .rst_ni(rst_n),
     /* data bus in */
@@ -150,12 +152,19 @@ mem mem0 (
 uart uart0 (
     .clk_i(sysclk),
     .rst_ni(rst_n),
+    /* serial rx in */
     .uart_rx_i(uart_txd_in),
+    /* uart we */
     .uart_we_i(bus_we & uart_cs),
+    /* uart re */
     .uart_re_i(~uart_irq[1]),
+    /* uart tx parallel */
     .uart_tx_wdata_i(bus_data[7:0]),
+    /* uart rx parallel */
     .uart_rx_rdata_o(uart_rx_rdata),
+    /* serial tx out */
     .uart_tx_o(uart_rxd_out),
+    /* interrupt request vector */
     .uart_irq_o(uart_irq)
 );
 

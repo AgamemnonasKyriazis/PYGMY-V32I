@@ -1,6 +1,7 @@
+`timescale 1ns / 1ps
+
 module rom (
     input wire [31:0] addr_i,
-    input wire cs_i,
     input wire [1:0] hb_i,
     output reg [31:0] rdata_o
 );
@@ -10,7 +11,7 @@ wire [31:0] addr;
 reg [31:0] rom [0:255];
 
 initial begin
-    $readmemh("image.hex", rom);
+    $readmemh("../sw/image.hex", rom);
 end
 
 always @(*) begin
@@ -38,7 +39,7 @@ end
 assign addr = addr_i >> 2;
 
 always @(rdata_o) begin
-    $display("ROM : %b %x %b %x", cs_i, addr_i, hb_i, rdata_o);
+    //$display("ROM : %x %b %x", addr_i, hb_i, rdata_o);
 end
 
 endmodule

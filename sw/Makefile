@@ -10,7 +10,7 @@ all:    $(TARGET).bin;
 	@hexdump -v -e '"@%04_ax " 1/1 "%02x\n"' main.bin > readmemfmt.hex;
 	@python3 main.py > image.hex;
 	@rm readmemfmt.hex;
-	echo "DONE"
+	@echo "DONE"
 
 # Rule to build the start.o file
 start.o: start.s
@@ -34,5 +34,5 @@ $(TARGET).bin: $(TARGET).elf
 
 # Rule to clean the build files
 clean:
-	rm -f $(TARGET).o start.o $(TARGET).elf $(TARGET).hex $(TARGET).bin
+	rm -f $(TARGET).o start.o $(TARGET).elf $(TARGET).hex $(TARGET).bin image.hex
 

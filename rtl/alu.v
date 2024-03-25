@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module alu (
     input wire signed [31:0] op1_i,
     

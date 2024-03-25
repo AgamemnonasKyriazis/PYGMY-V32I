@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module decode(
 
     input wire clk_i,

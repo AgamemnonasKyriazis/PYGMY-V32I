@@ -3,8 +3,8 @@
 Pygmy is a tiny RISC-V programmable **microcontroller** for embedded/FPGA applications designed entirely in Verilog HDL. Its initial use case is to replace complex state machines and to perform house-keeping operations in large systems that need a flexible master controller.
 
 * Go to [sw] directory and hit make clean/make all.
-* Copy the image.hex into the [rtl] directory.
-* Create a Vivado project and import the .v and .hex files.
+* Got to [rtl] directory and hit make clean/make all.
+* Load the bitstream generated using any program you prefer.
 
 Available Features:
 * Fully programmable in C.
@@ -17,8 +17,6 @@ This is an early version of what the final project is envisioned to be. Any inco
 
 TODO:
 * Interrupt controller.
-* TCL scipts for bitstream generation through cmd.
 * Expandability (ability to include multiple peripherals).
 * GPIO interface.
-
-:smiley:
+* Further reduce size in LUTs and FF.
