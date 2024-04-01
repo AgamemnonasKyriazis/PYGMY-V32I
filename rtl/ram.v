@@ -3,8 +3,7 @@
 module ram(
     /* system clock */
     input wire clk_i,
-    /* system reset */
-    input wire rst_ni,
+
     /* data bus in */
     input wire [31:0] wdata_i,
     /* address bus in */
@@ -39,7 +38,7 @@ always @(posedge clk_i) begin
         4'b0011 : {mem1[addr], mem0[addr]} <= wdata_i[15:0];
         4'b1100 : {mem3[addr], mem2[addr]} <= wdata_i[15:0];
         4'b1111 : {mem3[addr], mem2[addr], mem1[addr], mem0[addr]} <= wdata_i;
-        default : ;
+        default : {mem3[addr], mem2[addr], mem1[addr], mem0[addr]} <= wdata_i;
         endcase
     end
 end
@@ -54,25 +53,25 @@ always @(*) begin
         4'b0011 : rdata_o <= (uload_i)? { 16'b0, mem1[addr], mem0[addr] } : { {16{mem1[addr][7]}}, mem1[addr], mem0[addr] };
         4'b1100 : rdata_o <= (uload_i)? { 16'b0, mem3[addr], mem2[addr] } : { {16{mem3[addr][7]}}, mem3[addr], mem2[addr] };
         4'b1111 : rdata_o <= {mem3[addr], mem2[addr], mem1[addr], mem0[addr]};
-        default : rdata_o <= 32'hx;
+        default : rdata_o <= {mem3[addr], mem2[addr], mem1[addr], mem0[addr]};
         endcase
     end
     else begin
-        rdata_o <= 32'hx;
+        rdata_o <= 32'd0;
     end
 end
 
 always @(*) begin
     case (hb_i)
-    2'b00 : en_vec <= 4'b1111;
-    2'b01 :
+    2'b10 : en_vec <= 4'b1111;
+    2'b00 :
         case (addr_i[1:0])
         2'b00 : en_vec <= 4'b0001;
         2'b01 : en_vec <= 4'b0010;
         2'b10 : en_vec <= 4'b0100;
         2'b11 : en_vec <= 4'b1000;
         endcase
-    2'b10 :
+    2'b01 :
         case (addr_i[1])
         1'b0 : en_vec <= 4'b0011;
         1'b1 : en_vec <= 4'b1100;

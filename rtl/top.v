@@ -9,10 +9,6 @@ module top(
 
 wire rst_n;
 
-wire [31:0] instr;
-wire [31:0] program_pointer;
-wire core_state;
-
 wire [31:0] rs1;
 wire [31:0] rs2;
 wire [31:0] imm;
@@ -51,11 +47,6 @@ decode d0 (
     .clk_i(sysclk),
     .rst_ni(rst_n),
 
-    /* program */
-    .program_instr_i(instr),
-    .program_pointer_o(program_pointer),
-    .core_state_o(core_state),
-
     /* WB */
     .rd_i(wb_rd),
     .rd_ptr_i(wb_rd_ptr),
@@ -80,14 +71,6 @@ decode d0 (
 );
 
 execute e0 (
-    .clk_i(sysclk),
-    .rst_ni(rst_n),
-
-    /* program */
-    .program_pointer_i(program_pointer),
-    .core_state_i(core_state),
-    .program_instr_o(instr),
-
     /* EXE operands */
     .rs1_i(rs1),
     .rs2_i(rs2),
@@ -134,7 +117,6 @@ rom rom0 (
 
 ram ram0 (
     .clk_i(sysclk),
-    .rst_ni(rst_n),
     /* data bus in */
     .wdata_i(bus_data),
     /* address bus in */
@@ -157,7 +139,7 @@ uart uart0 (
     /* uart we */
     .uart_we_i(bus_we & uart_cs),
     /* uart re */
-    .uart_re_i(~uart_irq[1]),
+    .uart_re_i(~bus_we & uart_cs),
     /* uart tx parallel */
     .uart_tx_wdata_i(bus_data[7:0]),
     /* uart rx parallel */

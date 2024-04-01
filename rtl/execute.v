@@ -1,14 +1,6 @@
 `timescale 1ns / 1ps
 
 module execute (
-    input wire clk_i,
-    input wire rst_ni,
-
-    /* program */
-    input wire [31:0] program_pointer_i,
-    input wire core_state_i,
-    output wire [31:0] program_instr_o,
-
     /* EXE operands */
     input wire [4:0] rd_ptr_i,
     input wire [31:0] rs1_i,
@@ -42,9 +34,6 @@ module execute (
     output wire [1:0] bus_hb_o,
     output wire [2:0] bus_cs_o
 );
-
-localparam INSTRUCTION_FETCH = 0;
-localparam INSTRUCTION_EXECUTE = 1;
 
 wire [31:0] alu_op1, alu_op2, alu_res;
 
@@ -91,13 +80,10 @@ assign alu_op1 = rs1_i;
 assign alu_op2 = (alu_src_i)? imm_i : rs2_i;
 
 assign mem_wdata = rs2_i;
-assign mem_addr = (core_state_i == INSTRUCTION_FETCH)? program_pointer_i : alu_res;
+assign mem_addr = alu_res;
 
 assign rd_o = (mem_re_i)? mem_rdata : alu_res;
 assign rd_ptr_o = rd_ptr_i;
 assign reg_we_o = reg_we_i;
-
-
-assign program_instr_o = (core_state_i == INSTRUCTION_FETCH)? mem_rdata : 32'b0;
 
 endmodule

@@ -30,51 +30,33 @@ module lsu (
     output reg [2:0] bus_cs_o
 );
 
-localparam ROM_BASE = 32'h00000000;
-localparam ROM_SIZE = 256;
-
-localparam RAM_BASE = 32'h00000100;
-localparam RAM_SIZE = 256;
+localparam ROM_BASE  = 32'h000000zz;
+localparam RAM_BASE  = 32'h000001zz;
+localparam UART_BASE = 32'h000002zz; 
 
 always @(*) begin
-    
     bus_rdata_o <= core_wdata_i;
     bus_we_o <= core_we_i;
     bus_hb_o <= core_hb_i;
-
-    if ( (ROM_BASE <= core_addr_i) && (core_addr_i <= (ROM_BASE + ROM_SIZE - 1)) ) begin
-        bus_addr_o <= (core_addr_i - ROM_BASE);
-    end
-    else if ( (RAM_BASE <= core_addr_i) && (core_addr_i <= (RAM_BASE + RAM_SIZE - 1)) ) begin
-        bus_addr_o <= (core_addr_i - RAM_BASE);
-    end
-    else begin
-        bus_addr_o <= core_addr_i;
-    end
+    bus_addr_o <= {24'b0, core_addr_i[7:0]};
 end
 
 always @(*) begin
-    if ( (ROM_BASE <= core_addr_i) && (core_addr_i <= (ROM_BASE + ROM_SIZE - 1)) ) begin
-        core_rdata_o <= rom_data_i;
-    end
-    else if ( (RAM_BASE <= core_addr_i) && (core_addr_i <= (RAM_BASE + RAM_SIZE - 1)) ) begin
-        core_rdata_o <= ram_data_i;
-    end
-    else begin
-        core_rdata_o <= rom_data_i;
-    end
+    casez (core_addr_i)
+    ROM_BASE : core_rdata_o <= rom_data_i;
+    RAM_BASE : core_rdata_o <= ram_data_i;
+    UART_BASE : core_rdata_o <= uart_data_i;
+    default  : core_rdata_o <= rom_data_i;
+    endcase
 end
 
 always @(*) begin
-    if ( (ROM_BASE <= core_addr_i) && (core_addr_i <= (ROM_BASE + ROM_SIZE - 1)) ) begin
-        bus_cs_o <= 3'b001;
-    end
-    else if ( (RAM_BASE <= core_addr_i) && (core_addr_i <= (RAM_BASE + RAM_SIZE - 1)) ) begin
-        bus_cs_o <= 3'b010;
-    end
-    else begin
-        bus_cs_o <= 3'b100;
-    end
+    casez (core_addr_i)
+    ROM_BASE : bus_cs_o <= 3'b001;
+    RAM_BASE : bus_cs_o <= 3'b010;
+    UART_BASE : bus_cs_o <= 3'b100;
+    default  : bus_cs_o <= 3'b001;
+    endcase
 end
 
 endmodule

@@ -10,16 +10,16 @@ module alu (
     output reg [31:0] res_o
 );
 
-localparam [3:0] ADD  = 0;
-localparam [3:0] SUB  = 1;
-localparam [3:0] XOR  = 2;
-localparam [3:0] OR   = 3;
-localparam [3:0] AND  = 4;
-localparam [3:0] SLL  = 5;
-localparam [3:0] SRL  = 6;
-localparam [3:0] SRA  = 7;
-localparam [3:0] SLT  = 8;
-localparam [3:0] SLTU = 9;
+localparam [3:0] ADD    =   4'b0000;
+localparam [3:0] SUB    =   4'b1000;
+localparam [3:0] XOR    =   4'b0100;
+localparam [3:0] OR     =   4'b0110;
+localparam [3:0] AND    =   4'b0111;
+localparam [3:0] SLL    =   4'b0001;
+localparam [3:0] SRL    =   4'b0101;
+localparam [3:0] SRA    =   4'b1010;
+localparam [3:0] SLT    =   4'b0010;
+localparam [3:0] SLTU   =   4'b0011;
 
 always @(*) begin
     case (opcode_i)

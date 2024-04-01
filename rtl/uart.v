@@ -159,7 +159,6 @@ always @(posedge tx_clk, negedge rst_ni) begin: TxSyncStateMachine
         case(tx_state)
         TX_IDLE : begin
             tx_frame_count <= 'b0;
-            $display("%c", tx_fifo_data_o);
             tx_frame_buf <= {tx_fifo_data_o, 1'b0};
             tx <= 'b1;
         end
@@ -228,5 +227,10 @@ assign uart_tx_o = tx;
 assign rx = rx_sft_reg[0];
 
 assign uart_irq_o = {tx_fifo_full, ~rx_fifo_empty};
+
+always @(posedge tx_clk) begin
+    if (~tx_fifo_empty & tx_state == TX_IDLE)
+        $display("%x \t %c", tx_fifo_data_o, tx_fifo_data_o);
+end
 
 endmodule

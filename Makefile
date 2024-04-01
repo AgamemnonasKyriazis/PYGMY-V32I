@@ -1,5 +1,9 @@
 SHELL=/bin/bash
 
+flash:
+	cd build/;\
+	vivado -mode batch -nolog -nojournal -source ../flash.tcl;\
+
 all:
 	mkdir build;\
 	cd build/;\
