@@ -1,0 +1,56 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Wed Apr 10 19:46:14 2024
+[*]
+[dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
+[dumpfile_mtime] "Wed Apr 10 19:41:58 2024"
+[dumpfile_size] 11078237
+[savefile] "/home/agamemnon/Desktop/PYGMY/test/mem.gtkw"
+[timestart] 0
+[size] 1850 920
+[pos] -38 -38
+*-16.000000 100500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top_tb.
+[treeopen] top_tb.u0.
+[treeopen] top_tb.u0.e0.
+[sst_width] 233
+[signals_width] 319
+[sst_expanded] 1
+[sst_vpaned_height] 296
+@28
+top_tb.u0.sysclk
+@22
+top_tb.u0.e0.l0.bus_addr_o[31:0]
+top_tb.u0.e0.l0.core_wdata_i[31:0]
+top_tb.u0.e0.l0.bus_rdata_o[31:0]
+@200
+-
+-
+@28
+top_tb.u0.e0.clk_i
+top_tb.u0.stall
+@200
+-
+@22
+top_tb.u0.d0.instruction_i[31:0]
+top_tb.u0.d0.program_pointer_o[31:0]
+@28
+top_tb.u0.d0.isBranch
+top_tb.u0.d0.isJal
+top_tb.u0.d0.isFollowed
+top_tb.u0.d0.mem_re_o
+top_tb.u0.d0.mem_we_o
+@200
+-
+@22
+top_tb.u0.e0.a0.op1_i[31:0]
+top_tb.u0.e0.a0.op2_i[31:0]
+@200
+-
+@22
+top_tb.u0.e0.rd_o[31:0]
+top_tb.u0.e0.l0.core_wdata_i[31:0]
+@23
+top_tb.u0.e0.l0.core_rdata_o[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

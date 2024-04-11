@@ -2,36 +2,33 @@
 
 module regfile (
     input wire clk_i,
-    input wire rst_ni,
 
     input wire reg_write_en_i,
-
-    input wire [4:0] rs1_ptr_i,
-    input wire [4:0] rs2_ptr_i,
+    
     input wire [4:0] rd_ptr_i,
-
     input wire [31:0] rd_i,
 
-    output wire [31:0] rs1_o,
-    output wire [31:0] rs2_o
-);
+    input wire [4:0] rs1_ptr_i,
+    output reg [31:0] rs1_o,
 
-reg is_reg_zero;
+    input wire [4:0] rs2_ptr_i,
+    output reg [31:0] rs2_o
+);
 
 reg [31:0] register_arr [0:31];
 
 initial begin
-    register_arr[0] <= 32'b0;
+    register_arr[0] <= 32'd0;
 end
 
 always @(negedge clk_i) begin
-    if ( (reg_write_en_i == 1'b1) && (is_reg_zero == 1'b0) )
+    if ( (reg_write_en_i) & (|rd_ptr_i) )
         register_arr[rd_ptr_i] <= rd_i;
 end
 
-always @(*) is_reg_zero = rd_ptr_i == 'b0;
-
-assign rs1_o = register_arr[rs1_ptr_i];
-assign rs2_o = register_arr[rs2_ptr_i];
+always @(*) begin
+    rs1_o <= register_arr[rs1_ptr_i];
+    rs2_o <= register_arr[rs2_ptr_i];
+end
 
 endmodule

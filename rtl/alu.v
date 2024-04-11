@@ -5,21 +5,21 @@ module alu (
     
     input wire signed [31:0] op2_i,
 
-    input wire [3:0] opcode_i,
+    input wire [7:0] opcode_i,
 
     output reg [31:0] res_o
 );
 
-localparam [3:0] ADD    =   4'b0000;
-localparam [3:0] SUB    =   4'b1000;
-localparam [3:0] XOR    =   4'b0100;
-localparam [3:0] OR     =   4'b0110;
-localparam [3:0] AND    =   4'b0111;
-localparam [3:0] SLL    =   4'b0001;
-localparam [3:0] SRL    =   4'b0101;
-localparam [3:0] SRA    =   4'b1010;
-localparam [3:0] SLT    =   4'b0010;
-localparam [3:0] SLTU   =   4'b0011;
+localparam [7:0] ADD    =   8'b00000001 << 3'b000;
+localparam [7:0] SUB    =   8'b00000001 << 3'b000;
+localparam [7:0] XOR    =   8'b00000001 << 3'b100;
+localparam [7:0] OR     =   8'b00000001 << 3'b110;
+localparam [7:0] AND    =   8'b00000001 << 3'b111;
+localparam [7:0] SLL    =   8'b00000001 << 3'b001;
+localparam [7:0] SRL    =   8'b00000001 << 3'b101;
+localparam [7:0] SRA    =   8'b00000001 << 3'b010;
+localparam [7:0] SLT    =   8'b00000001 << 3'b010;
+localparam [7:0] SLTU   =   8'b00000001 << 3'b011;
 
 always @(*) begin
     case (opcode_i)

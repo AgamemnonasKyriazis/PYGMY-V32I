@@ -1,16 +1,21 @@
-SHELL=/bin/bash
+# Variables
+SHELL = /bin/bash
 
+# Phony targets
+.PHONY: all flash clean
+
+# Default target
+all: build
+
+# Rule to create build directory
+build:
+	mkdir -p build/synth/reports build/bit
+	vivado -mode batch -nolog -nojournal -source build.tcl
+
+# Rule to flash
 flash:
-	cd build/;\
-	vivado -mode batch -nolog -nojournal -source ../flash.tcl;\
+	vivado -mode batch -nolog -nojournal -source flash.tcl
 
-all:
-	mkdir build;\
-	cd build/;\
-	mkdir synth;\
-	mkdir synth/reports;\
-	mkdir bit;\
-	vivado -mode batch -nolog -nojournal -source ../build.tcl;\
-
-clean:  
-	rm -r build/;\
+# Rule to clean
+clean:
+	rm -rf build

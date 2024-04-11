@@ -4,8 +4,17 @@ module top(
     input wire sysclk,
     input wire rst,
     input wire uart_txd_in,
-    output wire uart_rxd_out
-    );
+    output wire uart_rxd_out,
+
+    output wire [18:0] MemAdr,
+    inout wire [7:0] MemDB,
+    output wire RamOEn,
+    output wire RamWEn,
+    output wire RamCEn
+);
+
+localparam BOOT   =   1'b0;
+localparam RUN    =   1'b1;
 
 wire rst_n;
 
@@ -14,7 +23,8 @@ wire [31:0] rs2;
 wire [31:0] imm;
 wire [4:0] rd_ptr;
 
-wire [3:0] alu_opcode;
+wire [7:0] funct3I;
+wire [6:0] funct7;
 wire alu_src;
 
 wire reg_we;
@@ -35,17 +45,41 @@ wire [1:0] bus_hb;
 wire [31:0] rom_data;
 wire [31:0] ram_data;
 wire [31:0] uart_data;
+wire [7:0] ramio_data;
 
 wire rom_cs;
 wire ram_cs;
 wire uart_cs;
+wire ramio_cs;
 
 wire [1:0] uart_irq;
 wire [7:0] uart_rx_rdata;
 
+wire ram_control_stall;
+
+reg core_state;
+wire [31:0] program_pointer;
+wire [31:0] instruction;
+
+always @(posedge sysclk, negedge rst_n) begin
+    if (~rst_n)
+        core_state <= BOOT;
+    else
+        core_state <= RUN;
+end
+
+reg stall;
+always @(*) begin
+    stall <= (mem_we | mem_re) ;
+end
+
 decode d0 (
     .clk_i(sysclk),
-    .rst_ni(rst_n),
+
+    .core_state_i(core_state),
+    .instruction_i(instruction),
+    .stall_i(stall),
+    .program_pointer_o(program_pointer),
 
     /* WB */
     .rd_i(wb_rd),
@@ -59,7 +93,8 @@ decode d0 (
     .rd_ptr_o(rd_ptr),
 
     /* ALU control */
-    .alu_opcode_o(alu_opcode),
+    .funct3I_o(funct3I),
+    .funct7_o(funct7),
     .alu_src_o(alu_src),
 
     /* WE/RE control */
@@ -71,6 +106,14 @@ decode d0 (
 );
 
 execute e0 (
+    .clk_i(sysclk),
+    .rst_ni(rst_n),
+
+    .core_state_i(core_state),
+    .program_pointer_i(program_pointer),
+    .stall_i(stall),
+    .instruction_o(instruction),
+
     /* EXE operands */
     .rs1_i(rs1),
     .rs2_i(rs2),
@@ -78,7 +121,8 @@ execute e0 (
     .rd_ptr_i(rd_ptr),
 
     /* ALU control */
-    .alu_opcode_i(alu_opcode),
+    .funct3I_i(funct3I),
+    .funct7_i(funct7),
     .alu_src_i(alu_src),
 
     /* WE/RE control (IN) */
@@ -97,13 +141,14 @@ execute e0 (
     .rom_data_i(rom_data),
     .ram_data_i(ram_data),
     .uart_data_i({24'b0, uart_rx_rdata}),
+    .ramio_data_i({24'b0, ramio_data}),
 
     .bus_data_o(bus_data),
     .bus_addr_o(bus_addr),
     .bus_we_o(bus_we),
     .bus_hb_o(bus_hb),
 
-    .bus_cs_o({uart_cs, ram_cs, rom_cs})
+    .bus_cs_o({ramio_cs, uart_cs, ram_cs, rom_cs})
 );
 
 rom rom0 (

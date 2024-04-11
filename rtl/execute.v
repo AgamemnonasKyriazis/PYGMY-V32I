@@ -1,6 +1,14 @@
 `timescale 1ns / 1ps
 
 module execute (
+    input wire clk_i,
+    input wire rst_ni,
+
+    input wire core_state_i,
+    input wire [31:0] program_pointer_i,
+    input wire stall_i,
+    output reg [31:0] instruction_o,
+
     /* EXE operands */
     input wire [4:0] rd_ptr_i,
     input wire [31:0] rs1_i,
@@ -8,7 +16,8 @@ module execute (
     input wire [31:0] imm_i,
 
     /* ALU control */
-    input wire [3:0] alu_opcode_i,
+    input wire [7:0] funct3I_i,
+    input wire [6:0] funct7_i,
     input wire alu_src_i,
     
     /* WB control (IN) */
@@ -27,22 +36,32 @@ module execute (
     input wire [31:0] rom_data_i,
     input wire [31:0] ram_data_i,
     input wire [31:0] uart_data_i,
+    input wire [31:0] ramio_data_i,
 
     output wire [31:0] bus_data_o,
     output wire [31:0] bus_addr_o,
     output wire bus_we_o,
     output wire [1:0] bus_hb_o,
-    output wire [2:0] bus_cs_o
+    output wire [3:0] bus_cs_o
 );
+
+localparam BOOT   =   1'b0;
+localparam RUN    =   1'b1;
 
 wire [31:0] alu_op1, alu_op2, alu_res;
 
 wire [31:0] mem_addr, mem_wdata, mem_rdata;
 
+wire load_instruction;
+
 alu a0 (
+    /* ALU OP1 */
     .op1_i(alu_op1),
+    /* ALU OP2 */
     .op2_i(alu_op2),
-    .opcode_i(alu_opcode_i),
+    /* ALU OPCODE */
+    .opcode_i(funct3I_i),
+    /* ALU RES */
     .res_o(alu_res)
 );
 
@@ -55,7 +74,7 @@ lsu l0 (
     /* core write enable */
     .core_we_i(mem_we_i),
     /* core mode half-word-byte */
-    .core_hb_i(mem_hb_i),
+    .core_hb_i( (mem_re_i | mem_we_i)? mem_hb_i : 2'b10 ),
     /* core data data from bus */
     .core_rdata_o(mem_rdata),
 
@@ -64,6 +83,7 @@ lsu l0 (
     .rom_data_i(rom_data_i),
     .ram_data_i(ram_data_i),
     .uart_data_i(uart_data_i),
+    .ramio_data_i(ramio_data_i),
     /* bus data from core */
     .bus_rdata_o(bus_data_o),
     /* bus address */
@@ -72,7 +92,7 @@ lsu l0 (
     .bus_we_o(bus_we_o),
     /* bus mode half-word-byte */
     .bus_hb_o(bus_hb_o),
-
+    /* bus chip select */
     .bus_cs_o(bus_cs_o)
 );
 
@@ -80,10 +100,13 @@ assign alu_op1 = rs1_i;
 assign alu_op2 = (alu_src_i)? imm_i : rs2_i;
 
 assign mem_wdata = rs2_i;
-assign mem_addr = alu_res;
+assign mem_addr = ((~mem_re_i) & (~mem_we_i))? program_pointer_i : alu_res;
 
 assign rd_o = (mem_re_i)? mem_rdata : alu_res;
 assign rd_ptr_o = rd_ptr_i;
 assign reg_we_o = reg_we_i;
+
+always @(negedge clk_i)
+    instruction_o <= (stall_i)? 32'd0 : mem_rdata;
 
 endmodule

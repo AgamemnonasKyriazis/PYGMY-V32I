@@ -1,9 +1,12 @@
 `timescale 1ns / 1ps
 
 module decode(
-
     input wire clk_i,
-    input wire rst_ni,
+
+    input wire core_state_i,
+    input wire [31:0] instruction_i,
+    input wire stall_i,
+    output reg [31:0] program_pointer_o,
 
     /* WB */
     input wire [31:0] rd_i,
@@ -17,7 +20,8 @@ module decode(
     output reg [4:0] rd_ptr_o,
     
     /* ALU control */
-    output reg [3:0] alu_opcode_o,
+    output reg [7:0] funct3I_o,
+    output reg [6:0] funct7_o,
     output reg alu_src_o,
 
     /* WE/RE control */
@@ -28,65 +32,55 @@ module decode(
     output reg ul_o
 );
 
-localparam [1:0] FETCH      =   2'b01;
-localparam [1:0] DEC        =   2'b10;
-localparam [1:0] EXEC       =   2'b11;
+localparam BOOT   =   1'b0;
+localparam RUN    =   1'b1;
 
 localparam [6:0] ALU_R      =   7'b0110011;
 localparam [6:0] ALU_I      =   7'b0010011;
 localparam [6:0] LOAD       =   7'b0000011;
 localparam [6:0] STORE      =   7'b0100011;
 localparam [6:0] BRANCH     =   7'b1100011;
-localparam [6:0] JUMP       =   7'b1101111;
+localparam [6:0] JAL        =   7'b1101111;
 localparam [6:0] LUI        =   7'b0110111;
 localparam [6:0] AUIPC      =   7'b0010111;
 
-localparam [3:0] ADD    =   4'b0000;
-localparam [3:0] SUB    =   4'b1000;
-localparam [3:0] XOR    =   4'b0100;
-localparam [3:0] OR     =   4'b0110;
-localparam [3:0] AND    =   4'b0111;
-localparam [3:0] SLL    =   4'b0001;
-localparam [3:0] SRL    =   4'b0101;
-localparam [3:0] SRA    =   4'b1010;
-localparam [3:0] SLT    =   4'b0010;
-localparam [3:0] SLTU   =   4'b0011;
+wire [6:0] opcode = instruction_i[6:0];
+wire isAluReg   = (opcode == ALU_R);
+wire isAluImm   = (opcode == ALU_I);
+wire isLoad     = (opcode == LOAD);
+wire isStore    = (opcode == STORE);
+wire isBranch   = (opcode == BRANCH);
+wire isJal      = (opcode == JAL);
+wire isLui      = (opcode == LUI);
+wire isAuipc    = (opcode == AUIPC);     
 
-localparam [2:0] BEQ  = 3'b000;
-localparam [2:0] BNE  = 3'b001;
-localparam [2:0] BLT  = 3'b100;
-localparam [2:0] BGE  = 3'b101;
-localparam [2:0] BLTU = 3'b110;
-localparam [2:0] BGEU = 3'b111;
+localparam [7:0] ADD    =   8'b00000001 << 3'b000;
+localparam [7:0] SUB    =   8'b00000001 << 3'b000;
+localparam [7:0] XOR    =   8'b00000001 << 3'b100;
+localparam [7:0] OR     =   8'b00000001 << 3'b110;
+localparam [7:0] AND    =   8'b00000001 << 3'b111;
+localparam [7:0] SLL    =   8'b00000001 << 3'b001;
+localparam [7:0] SRL    =   8'b00000001 << 3'b101;
+localparam [7:0] SRA    =   8'b00000001 << 3'b010;
+localparam [7:0] SLT    =   8'b00000001 << 3'b010;
+localparam [7:0] SLTU   =   8'b00000001 << 3'b011;
+localparam [7:0] BEQ    =   8'b00000001 << 3'b000;
+localparam [7:0] BNE    =   8'b00000001 << 3'b001;
+localparam [7:0] BLT    =   8'b00000001 << 3'b100;
+localparam [7:0] BGE    =   8'b00000001 << 3'b101;
+localparam [7:0] BLTU   =   8'b00000001 << 3'b110;
+localparam [7:0] BGEU   =   8'b00000001 << 3'b111;
 
-reg [1:0] core_state;
-reg [31:0] instr;
-reg [31:0] program_pointer;
-reg [31:0] program_pointer_incr;
-
-wire [6:0] instr_opcode;
-wire [2:0] funct3;
-wire [6:0] funct7;
-reg [3:0] alu_opcode;
-
-wire [31:0] IMM_J;
-wire [31:0] IMM_B;
-wire [31:0] IMM_U;
-wire [31:0] IMM_R;
-wire [31:0] IMM_S;
-wire [31:0] SHAMT;
-
-reg branch_is_followed;
-
-wire [4:0] rs1_ptr;
-wire [4:0] rs2_ptr;
+wire [2:0] funct3 = instruction_i[14:12];
+wire [6:0] funct7 = instruction_i[31:25];
+wire [7:0] funct3I = 8'b00000001 << funct3;
+wire [7:0] aluOp = (isAluReg | isAluImm)? funct3I : ADD;
 
 wire signed [31:0] rs1;
 wire signed [31:0] rs2;
 
 regfile registers (
     .clk_i(clk_i),
-    .rst_ni(rst_ni),
     .reg_write_en_i(reg_we_i),
     .rs1_ptr_i(rs1_ptr),
     .rs2_ptr_i(rs2_ptr),
@@ -96,222 +90,160 @@ regfile registers (
     .rs2_o(rs2)
 );
 
-always @(*) begin
-    if (core_state == EXEC)
-        instr = rd_i;
-    else
-        instr = 32'd0;
-end
+wire EQ  = rs1 == rs2;
+wire NE  = ~BEQ;
+wire LT  = rs1 < rs2;
+wire GT  = ~LT;
+wire LTU = $unsigned(rs1) < $unsigned(rs2);
+wire GTU = ~LTU;
 
-always @(*) begin : AluControl
-    case (instr_opcode)
-    ALU_R : begin
-        alu_opcode = {funct7[5], funct3};
-    end
-    ALU_I : begin
-        alu_opcode = (funct3 == 3'h5)? {funct7[5], funct3} : {1'b0, funct3};
-    end
-    default : begin
-        alu_opcode = ADD;
-    end
-    endcase
-end
+wire isFollowed = 
+    (isBranch & 
+    (funct3I[0] & EQ) |
+    (funct3I[1] & NE) |
+    (funct3I[4] & LT) |
+    (funct3I[5] & GT) |
+    (funct3I[6] & LTU)|
+    (funct3I[7] & GTU));
 
-always @(*) begin : EvaluateBranch
-    case ({instr_opcode})
-    JUMP : branch_is_followed = 1'b1;
-    BRANCH :
-        case (funct3)
-        BEQ  : branch_is_followed = rs1 == rs2;
-        BNE  : branch_is_followed = rs1 != rs2;
-        BLT  : branch_is_followed = rs1 < rs2;
-        BGE  : branch_is_followed = rs1 >= rs2;
-        BLTU : branch_is_followed = $unsigned(rs1) < $unsigned(rs2);
-        BGEU : branch_is_followed = $unsigned(rs1) >= $unsigned(rs2);
-        default: branch_is_followed = 1'b0;
+wire [4:0] rd_ptr = instruction_i[11:7];
+wire [4:0] rs1_ptr = instruction_i[19:15];
+wire [4:0] rs2_ptr = instruction_i[24:20];
+
+wire [31:0] IMM_J = { {11{instruction_i[31]}}, instruction_i[31], instruction_i[19:12], instruction_i[20], instruction_i[30:21], 1'b0 };
+wire [31:0] IMM_B = { {19{instruction_i[31]}}, instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 1'b0 };
+wire [31:0] IMM_U = { instruction_i[31:12], 12'b0 };
+wire [31:0] IMM_R = { {20{instruction_i[31]}}, instruction_i[31:20] };
+wire [31:0] IMM_S = { {20{instruction_i[31]}}, instruction_i[31:25], instruction_i[11:7] };
+wire [31:0] SHAMT = { 25'b0, instruction_i[24:20] };
+
+wire [31:0] program_pointer_incr = (isJal)? IMM_J : (isFollowed & isBranch)? IMM_B : 32'd4;
+
+always @(posedge clk_i) begin : ProgramPointer
+    if (~stall_i)
+        case (core_state_i)
+        BOOT : program_pointer_o <= 32'd0;
+        RUN  : program_pointer_o <= program_pointer_o + program_pointer_incr;
         endcase
-    default : branch_is_followed = 1'b0;
-    endcase
 end
 
-always @(*) begin
-    case (instr_opcode)
-    JUMP    :   program_pointer_incr = IMM_J;
-    BRANCH  :   program_pointer_incr = (branch_is_followed)? IMM_B : 32'd4;
-    default :   program_pointer_incr = 32'd4;
-    endcase
+initial begin
+    reg_we_o  <= 1'b0;
+    mem_we_o  <= 1'b0;
+    mem_re_o  <= 1'b0;
+    hb_o      <= 2'b00;
+    ul_o      <= 1'b0;
+    alu_src_o <= 1'b0;
 end
 
-assign instr_opcode = instr[6:0];
-assign funct3 = instr[14:12];
-assign funct7 = instr[31:25];
-
-assign rs1_ptr = instr[19:15];
-assign rs2_ptr = instr[24:20];
-
-assign IMM_J = { {11{instr[31]}}, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0 };
-assign IMM_B = { {19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0 };
-assign IMM_U = { instr[31:12], 12'b0 };
-assign IMM_R = { {20{instr[31]}}, instr[31:20] };
-assign IMM_S = { {20{instr[31]}}, instr[31:25], instr[11:7] };
-assign SHAMT = { 25'b0, instr[24:20] };
-
-always @(posedge clk_i, negedge rst_ni) begin : ProgramPointer
-    if (~rst_ni)
-        program_pointer = 32'b0;
-    else if (core_state == EXEC)
-        program_pointer = program_pointer + program_pointer_incr;
-    else
-        program_pointer = program_pointer;
-end
-
-always @(posedge clk_i, negedge rst_ni) begin : SignalControl
-    if (~rst_ni) begin
-        reg_we_o  <= 1'b0;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        hb_o      <= 2'b10;
-        ul_o      <= 1'b0;
-        alu_src_o <= 1'b0;
-    end
-    else if (core_state == FETCH) begin
-        reg_we_o  <= 1'b0;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b1;
-        hb_o      <= 2'b10;
-        ul_o      <= 1'b0;
-        alu_src_o <= 1'b1;
-    end
-    else begin
-    case (instr_opcode)
-    ALU_R : begin
+always @(posedge clk_i) begin : SignalControl
+    case (1'b1)
+    isAluReg    : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= funct3[1:0];
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b0;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    ALU_I : begin
+    isAluImm    : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= funct3[1:0];
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b1;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    LOAD : begin
+    isLoad      : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b1;
-        hb_o      <= funct3[1:0];
-        ul_o      <= funct3[2];
         alu_src_o <= 1'b1;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    STORE : begin
+    isStore     : begin
         reg_we_o  <= 1'b0;
         mem_we_o  <= 1'b1;
         mem_re_o  <= 1'b0;
-        hb_o      <= funct3[1:0];
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b1;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    BRANCH : begin
+    isBranch    : begin
         reg_we_o  <= 1'b0;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= 2'b10;
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b0;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    JUMP : begin
+    isJal       : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= 2'b10;
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b1;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    LUI : begin
+    isLui       : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= funct3[1:0];
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b1;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
-    AUIPC : begin
+    isAuipc     : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= funct3[1:0];
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b1;
+        hb_o <= funct3[1:0];
+        ul_o <= funct3[2];
     end
     default : begin
         reg_we_o  <= 1'b0;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
-        hb_o      <= 2'b10;
-        ul_o      <= 1'b0;
         alu_src_o <= 1'b0;
+        hb_o <= 2'b00;
+        ul_o <= 1'b0;
     end
     endcase
-    end
+end
+
+always @(posedge clk_i) begin
+    funct3I_o <= aluOp;
+    funct7_o <= 7'd0;//funct7;
 end
 
 always @(posedge clk_i) begin : ImmSelector
-    if (core_state == FETCH)
-        imm_o = 32'd0;
-    else
-        case (instr_opcode)
-        ALU_I   :   
-            case (alu_opcode)
-            SLL, SRL, SRA : imm_o = SHAMT;
-            default : imm_o = IMM_R;
-            endcase
-        LOAD    :   imm_o = IMM_R;
-        STORE   :   imm_o = IMM_S;
-        JUMP    :   imm_o = 32'd4;
-        LUI     :   imm_o = IMM_U;
-        AUIPC   :   imm_o = IMM_U;
-        default :   imm_o = 32'd0;
-        endcase
+    case (1'b1)
+    isLoad   : imm_o <= IMM_R;
+    isStore  : imm_o <= IMM_S;
+    isJal    : imm_o <= 32'd4;
+    isLui    : imm_o <= IMM_U;
+    isAuipc  : imm_o <= IMM_U;
+    default  : imm_o <= IMM_R; 
+    endcase
 end
 
 always @(posedge clk_i) begin : Op1Selector
-    if (core_state == FETCH)
-        rs1_o = program_pointer;
-    else
-        case (instr_opcode)
-        JUMP    :   rs1_o = program_pointer;
-        AUIPC   :   rs1_o = program_pointer;
-        LUI     :   rs1_o = 32'd0;
-        default :   rs1_o = rs1;
-        endcase
+    case (1'b1)
+    isJal   :   rs1_o <= program_pointer_o;
+    isAuipc :   rs1_o <= program_pointer_o;
+    isLui   :   rs1_o <= 32'd0;
+    default :   rs1_o <= rs1;
+    endcase
 end
 
 always @(posedge clk_i) begin : Op2Selector
-    rs2_o = rs2;
+    rs2_o <= rs2;
 end
 
 always @(posedge clk_i) begin
-    rd_ptr_o <= instr[11:7];
-end
-
-always @(posedge clk_i) begin
-    alu_opcode_o <= alu_opcode;
-end
-
-always @(posedge clk_i, negedge rst_ni) begin
-    if (~rst_ni)
-        core_state = FETCH;
-    else
-        case (core_state)
-        FETCH : core_state <= EXEC;
-        EXEC  : core_state <= FETCH;
-        default : core_state <= FETCH;
-        endcase
+    rd_ptr_o <= rd_ptr;
 end
 
 endmodule

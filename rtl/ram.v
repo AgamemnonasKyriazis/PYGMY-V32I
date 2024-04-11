@@ -26,8 +26,6 @@ reg [7:0] mem1 [0:255];
 reg [7:0] mem2 [0:255];
 reg [7:0] mem3 [0:255];
 
-integer i;
-
 always @(posedge clk_i) begin
     if (we_i) begin
         case (en_vec)
