@@ -26,13 +26,13 @@ TODO:
 Utilization Table:
 |          Site Type         | Used | Fixed | Prohibited | Available | Util% |
 |----------------------------|------|-------|------------|-----------|-------|
-| Slice LUTs*                | 1317 |     0 |          0 |     20800 |  6.33 |
-|   LUT as Logic             | 1133 |     0 |          0 |     20800 |  5.45 |
-|   LUT as Memory            |  184 |     0 |          0 |      9600 |  1.92 |
-|     LUT as Distributed RAM |  184 |     0 |            |           |       |
+| Slice LUTs*                | 1021 |     0 |          0 |     20800 |  4.91 |
+|   LUT as Logic             |  925 |     0 |          0 |     20800 |  4.45 |
+|   LUT as Memory            |   96 |     0 |          0 |      9600 |  1.00 |
+|     LUT as Distributed RAM |   96 |     0 |            |           |       |
 |     LUT as Shift Register  |    0 |     0 |            |           |       |
-| Slice Registers            |  200 |     0 |          0 |     41600 |  0.48 |
-|   Register as Flip Flop    |  200 |     0 |          0 |     41600 |  0.48 |
+| Slice Registers            |  303 |     0 |          0 |     41600 |  0.73 |
+|   Register as Flip Flop    |  303 |     0 |          0 |     41600 |  0.73 |
 |   Register as Latch        |    0 |     0 |          0 |     41600 |  0.00 |
-| F7 Muxes                   |   65 |     0 |          0 |     16300 |  0.40 |
-| F8 Muxes                   |   32 |     0 |          0 |      8150 |  0.39 |
+| F7 Muxes                   |    0 |     0 |          0 |     16300 |  0.00 |
+| F8 Muxes                   |    0 |     0 |          0 |      8150 |  0.00 |
