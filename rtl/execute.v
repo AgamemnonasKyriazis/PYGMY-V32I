@@ -4,9 +4,11 @@ module execute (
     input wire clk_i,
     input wire rst_ni,
 
-    input wire core_state_i,
+    input wire [7:0] core_state_i,
+    input wire [31:0] instruction_i,
     input wire [31:0] program_pointer_i,
     input wire stall_i,
+    output wire [31:0] program_pointer_o,
     output reg [31:0] instruction_o,
 
     /* EXE operands */
@@ -36,17 +38,17 @@ module execute (
     input wire [31:0] rom_data_i,
     input wire [31:0] ram_data_i,
     input wire [31:0] uart_data_i,
-    input wire [31:0] ramio_data_i,
 
     output wire [31:0] bus_data_o,
     output wire [31:0] bus_addr_o,
     output wire bus_we_o,
     output wire [1:0] bus_hb_o,
-    output wire [3:0] bus_cs_o
-);
+    output wire [3:0] bus_cs_o,
 
-localparam BOOT   =   1'b0;
-localparam RUN    =   1'b1;
+    output wire bus_req_o,
+    input wire bus_gnt_i,
+    output wire stall_o
+);
 
 wire [31:0] alu_op1, alu_op2, alu_res;
 
@@ -61,6 +63,7 @@ alu a0 (
     .op2_i(alu_op2),
     /* ALU OPCODE */
     .opcode_i(funct3I_i),
+    .alu_op_i(funct7_i[6]),
     /* ALU RES */
     .res_o(alu_res)
 );
@@ -74,7 +77,7 @@ lsu l0 (
     /* core write enable */
     .core_we_i(mem_we_i),
     /* core mode half-word-byte */
-    .core_hb_i( (mem_re_i | mem_we_i)? mem_hb_i : 2'b10 ),
+    .core_hb_i(mem_hb_i),
     /* core data data from bus */
     .core_rdata_o(mem_rdata),
 
@@ -83,7 +86,6 @@ lsu l0 (
     .rom_data_i(rom_data_i),
     .ram_data_i(ram_data_i),
     .uart_data_i(uart_data_i),
-    .ramio_data_i(ramio_data_i),
     /* bus data from core */
     .bus_rdata_o(bus_data_o),
     /* bus address */
@@ -93,7 +95,11 @@ lsu l0 (
     /* bus mode half-word-byte */
     .bus_hb_o(bus_hb_o),
     /* bus chip select */
-    .bus_cs_o(bus_cs_o)
+    .bus_cs_o(bus_cs_o),
+    /* bus request */
+    .bus_req_o(bus_req_o),
+    /* bus granted */
+    .bus_gnt_i(bus_gnt_i)
 );
 
 assign alu_op1 = rs1_i;
@@ -106,7 +112,14 @@ assign rd_o = (mem_re_i)? mem_rdata : alu_res;
 assign rd_ptr_o = rd_ptr_i;
 assign reg_we_o = reg_we_i;
 
+assign stall_o = (bus_cs_o[1] & bus_req_o & ~bus_gnt_i);
+
 always @(negedge clk_i)
-    instruction_o <= (stall_i)? 32'd0 : mem_rdata;
+    if (~stall_i)
+        instruction_o <= instruction_i;
+    else
+        instruction_o <= 32'd0;
+
+assign program_pointer_o = program_pointer_i;
 
 endmodule

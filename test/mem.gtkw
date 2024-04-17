@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Apr 10 19:46:14 2024
+[*] Sat Apr 13 17:36:31 2024
 [*]
-[dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Wed Apr 10 19:41:58 2024"
-[dumpfile_size] 11078237
-[savefile] "/home/agamemnon/Desktop/PYGMY/test/mem.gtkw"
+[dumpfile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/top_tb.vcd"
+[dumpfile_mtime] "Sat Apr 13 17:35:48 2024"
+[dumpfile_size] 11275354
+[savefile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/mem.gtkw"
 [timestart] 0
-[size] 1850 920
-[pos] -38 -38
+[size] 1722 1056
+[pos] -138 -138
 *-16.000000 100500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.u0.
@@ -50,7 +50,13 @@ top_tb.u0.e0.a0.op2_i[31:0]
 @22
 top_tb.u0.e0.rd_o[31:0]
 top_tb.u0.e0.l0.core_wdata_i[31:0]
-@23
 top_tb.u0.e0.l0.core_rdata_o[31:0]
+@200
+-
+@28
+top_tb.u0.ram0.ce_i
+top_tb.u0.ram0.req_i
+@29
+top_tb.u0.ram0.gnt_o
 [pattern_trace] 1
 [pattern_trace] 0

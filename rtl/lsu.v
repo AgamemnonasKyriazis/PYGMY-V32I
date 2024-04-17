@@ -18,7 +18,6 @@ module lsu (
     input wire [31:0] rom_data_i,
     input wire [31:0] ram_data_i,
     input wire [31:0] uart_data_i,
-    input wire [31:0] ramio_data_i,
     /* bus data from core */
     output reg [31:0] bus_rdata_o, 
     /* bus address */
@@ -28,13 +27,20 @@ module lsu (
     /* bus mode half-word-byte */
     output reg [1:0] bus_hb_o,
     /* bus chip select */
-    output reg [3:0] bus_cs_o
+    output reg [3:0] bus_cs_o,
+    /* bus request */
+    output reg bus_req_o,
+    /* bus granted */
+    input wire bus_gnt_i
 );
 
-localparam ROM_BASE  = 32'h000000zz;
-localparam RAM_BASE  = 32'h000001zz;
-localparam UART_BASE = 32'h000002zz;
-localparam RAMIO_BASE= 32'h000003zz; 
+`include "Core.vh"
+
+always @(*)
+    if (bus_cs_o[1])
+        bus_req_o <= 1'b1;
+    else
+        bus_req_o <= 1'b0;
 
 always @(*) begin
     bus_rdata_o <= core_wdata_i;
@@ -48,7 +54,6 @@ always @(*) begin
     ROM_BASE : core_rdata_o <= rom_data_i;
     RAM_BASE : core_rdata_o <= ram_data_i;
     UART_BASE : core_rdata_o <= uart_data_i;
-    RAMIO_BASE: core_rdata_o <= ramio_data_i;
     default  : core_rdata_o <= rom_data_i;
     endcase
 end
@@ -58,7 +63,6 @@ always @(*) begin
     ROM_BASE : bus_cs_o <= {1'b0, 1'b0, 1'b0, 1'b1};
     RAM_BASE : bus_cs_o <= {1'b0, 1'b0, 1'b1, 1'b0};
     UART_BASE : bus_cs_o <= {1'b0, 1'b1, 1'b0, 1'b0};
-    RAMIO_BASE: bus_cs_o <= {1'b1, 1'b0, 1'b0, 1'b0};
     default  : bus_cs_o <= {1'b0, 1'b0, 1'b0, 1'b1};
     endcase
 end

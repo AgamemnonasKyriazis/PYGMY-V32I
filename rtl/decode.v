@@ -2,8 +2,9 @@
 
 module decode(
     input wire clk_i,
+    input wire rst_ni,
 
-    input wire core_state_i,
+    input wire [7:0] core_state_i,
     input wire [31:0] instruction_i,
     input wire stall_i,
     output reg [31:0] program_pointer_o,
@@ -32,17 +33,9 @@ module decode(
     output reg ul_o
 );
 
-localparam BOOT   =   1'b0;
-localparam RUN    =   1'b1;
-
-localparam [6:0] ALU_R      =   7'b0110011;
-localparam [6:0] ALU_I      =   7'b0010011;
-localparam [6:0] LOAD       =   7'b0000011;
-localparam [6:0] STORE      =   7'b0100011;
-localparam [6:0] BRANCH     =   7'b1100011;
-localparam [6:0] JAL        =   7'b1101111;
-localparam [6:0] LUI        =   7'b0110111;
-localparam [6:0] AUIPC      =   7'b0010111;
+`include "Core.vh"
+`include "Instruction_Set.vh"
+`include "ALU_Instructions.vh"
 
 wire [6:0] opcode = instruction_i[6:0];
 wire isAluReg   = (opcode == ALU_R);
@@ -53,23 +46,6 @@ wire isBranch   = (opcode == BRANCH);
 wire isJal      = (opcode == JAL);
 wire isLui      = (opcode == LUI);
 wire isAuipc    = (opcode == AUIPC);     
-
-localparam [7:0] ADD    =   8'b00000001 << 3'b000;
-localparam [7:0] SUB    =   8'b00000001 << 3'b000;
-localparam [7:0] XOR    =   8'b00000001 << 3'b100;
-localparam [7:0] OR     =   8'b00000001 << 3'b110;
-localparam [7:0] AND    =   8'b00000001 << 3'b111;
-localparam [7:0] SLL    =   8'b00000001 << 3'b001;
-localparam [7:0] SRL    =   8'b00000001 << 3'b101;
-localparam [7:0] SRA    =   8'b00000001 << 3'b010;
-localparam [7:0] SLT    =   8'b00000001 << 3'b010;
-localparam [7:0] SLTU   =   8'b00000001 << 3'b011;
-localparam [7:0] BEQ    =   8'b00000001 << 3'b000;
-localparam [7:0] BNE    =   8'b00000001 << 3'b001;
-localparam [7:0] BLT    =   8'b00000001 << 3'b100;
-localparam [7:0] BGE    =   8'b00000001 << 3'b101;
-localparam [7:0] BLTU   =   8'b00000001 << 3'b110;
-localparam [7:0] BGEU   =   8'b00000001 << 3'b111;
 
 wire [2:0] funct3 = instruction_i[14:12];
 wire [6:0] funct7 = instruction_i[31:25];
@@ -90,11 +66,17 @@ regfile registers (
     .rs2_o(rs2)
 );
 
+/* Equal */
 wire EQ  = rs1 == rs2;
-wire NE  = ~BEQ;
+/* Not Equal */
+wire NE  = ~EQ;
+/* Less */
 wire LT  = rs1 < rs2;
+/* Greater or Equal */
 wire GT  = ~LT;
+/* Less (unsigned) */
 wire LTU = $unsigned(rs1) < $unsigned(rs2);
+/* Greater or Equal (unsigned) */
 wire GTU = ~LTU;
 
 wire isFollowed = 
@@ -120,25 +102,18 @@ wire [31:0] SHAMT = { 25'b0, instruction_i[24:20] };
 wire [31:0] program_pointer_incr = (isJal)? IMM_J : (isFollowed & isBranch)? IMM_B : 32'd4;
 
 always @(posedge clk_i) begin : ProgramPointer
-    if (~stall_i)
+    if (~stall_i) begin
         case (core_state_i)
         BOOT : program_pointer_o <= 32'd0;
         RUN  : program_pointer_o <= program_pointer_o + program_pointer_incr;
         endcase
-end
-
-initial begin
-    reg_we_o  <= 1'b0;
-    mem_we_o  <= 1'b0;
-    mem_re_o  <= 1'b0;
-    hb_o      <= 2'b00;
-    ul_o      <= 1'b0;
-    alu_src_o <= 1'b0;
+    end
 end
 
 always @(posedge clk_i) begin : SignalControl
+    if (~stall_i) begin
     case (1'b1)
-    isAluReg    : begin
+    isAluReg   : begin
         reg_we_o  <= 1'b1;
         mem_we_o  <= 1'b0;
         mem_re_o  <= 1'b0;
@@ -211,14 +186,18 @@ always @(posedge clk_i) begin : SignalControl
         ul_o <= 1'b0;
     end
     endcase
+    end
 end
 
 always @(posedge clk_i) begin
+    if (~stall_i) begin
     funct3I_o <= aluOp;
-    funct7_o <= 7'd0;//funct7;
+    funct7_o <= (isAluReg)? funct7 : 7'd0;
+    end
 end
 
 always @(posedge clk_i) begin : ImmSelector
+    if (~stall_i) begin
     case (1'b1)
     isLoad   : imm_o <= IMM_R;
     isStore  : imm_o <= IMM_S;
@@ -227,23 +206,45 @@ always @(posedge clk_i) begin : ImmSelector
     isAuipc  : imm_o <= IMM_U;
     default  : imm_o <= IMM_R; 
     endcase
+    end
 end
 
 always @(posedge clk_i) begin : Op1Selector
+    if (~stall_i) begin
     case (1'b1)
     isJal   :   rs1_o <= program_pointer_o;
     isAuipc :   rs1_o <= program_pointer_o;
     isLui   :   rs1_o <= 32'd0;
     default :   rs1_o <= rs1;
     endcase
+    end
 end
 
 always @(posedge clk_i) begin : Op2Selector
+    if (~stall_i) begin
     rs2_o <= rs2;
+    end
 end
 
 always @(posedge clk_i) begin
+    if (~stall_i) begin
     rd_ptr_o <= rd_ptr;
+    end
+end
+
+initial begin
+    reg_we_o  <= 1'b0;
+    mem_we_o  <= 1'b0;
+    mem_re_o  <= 1'b0;
+    hb_o      <= 2'b00;
+    ul_o      <= 1'b0;
+    alu_src_o <= 1'b0;
+
+    rs1_o <= 32'd0;
+    rs2_o <= 32'd0;
+    rd_ptr_o <= 5'd0;
+
+    program_pointer_o <= 32'd0;
 end
 
 endmodule

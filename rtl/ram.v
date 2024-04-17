@@ -4,6 +4,10 @@ module ram(
     /* system clock */
     input wire clk_i,
 
+    input wire ce_i,
+    input wire req_i,
+    output reg gnt_o,
+
     /* data bus in */
     input wire [31:0] wdata_i,
     /* address bus in */
@@ -26,8 +30,16 @@ reg [7:0] mem1 [0:255];
 reg [7:0] mem2 [0:255];
 reg [7:0] mem3 [0:255];
 
+initial begin
+    gnt_o <= 1'b0;
+end
+
 always @(posedge clk_i) begin
-    if (we_i) begin
+    gnt_o <= req_i & ce_i;
+end
+
+always @(posedge clk_i) begin
+    if (req_i & ce_i & we_i) begin
         case (en_vec)
         4'b0001 : mem0[addr] <= wdata_i[7:0];
         4'b0010 : mem1[addr] <= wdata_i[7:0];
@@ -42,7 +54,7 @@ always @(posedge clk_i) begin
 end
 
 always @(*) begin
-    if (~we_i) begin
+    if (req_i & ce_i & (~we_i)) begin
         case (en_vec)
         4'b0001 : rdata_o <= (uload_i)? { 24'b0, mem0[addr] } : { {24{mem0[addr][7]}}, mem0[addr] };
         4'b0010 : rdata_o <= (uload_i)? { 24'b0, mem1[addr] } : { {24{mem1[addr][7]}}, mem1[addr] };
@@ -55,7 +67,7 @@ always @(*) begin
         endcase
     end
     else begin
-        rdata_o <= 32'd0;
+        rdata_o <= 32'hxxxxxxxx;
     end
 end
 

@@ -13,8 +13,7 @@ module top(
     output wire RamCEn
 );
 
-localparam BOOT   =   1'b0;
-localparam RUN    =   1'b1;
+`include "Core.vh"
 
 wire rst_n;
 
@@ -47,6 +46,9 @@ wire [31:0] ram_data;
 wire [31:0] uart_data;
 wire [7:0] ramio_data;
 
+wire bus_req;
+wire bus_gnt;
+
 wire rom_cs;
 wire ram_cs;
 wire uart_cs;
@@ -55,11 +57,9 @@ wire ramio_cs;
 wire [1:0] uart_irq;
 wire [7:0] uart_rx_rdata;
 
-wire ram_control_stall;
-
-reg core_state;
-wire [31:0] program_pointer;
-wire [31:0] instruction;
+reg [7:0] core_state;
+wire [31:0] program_pointer, rom_ptr2_addr;
+wire [31:0] instruction, rom_ptr2_data;
 
 always @(posedge sysclk, negedge rst_n) begin
     if (~rst_n)
@@ -68,13 +68,11 @@ always @(posedge sysclk, negedge rst_n) begin
         core_state <= RUN;
 end
 
-reg stall;
-always @(*) begin
-    stall <= (mem_we | mem_re) ;
-end
+wire stall;
 
 decode d0 (
     .clk_i(sysclk),
+    .rst_ni(rst_n),
 
     .core_state_i(core_state),
     .instruction_i(instruction),
@@ -110,8 +108,10 @@ execute e0 (
     .rst_ni(rst_n),
 
     .core_state_i(core_state),
+    .instruction_i(rom_ptr2_data),
     .program_pointer_i(program_pointer),
     .stall_i(stall),
+    .program_pointer_o(rom_ptr2_addr),
     .instruction_o(instruction),
 
     /* EXE operands */
@@ -141,33 +141,43 @@ execute e0 (
     .rom_data_i(rom_data),
     .ram_data_i(ram_data),
     .uart_data_i({24'b0, uart_rx_rdata}),
-    .ramio_data_i({24'b0, ramio_data}),
 
     .bus_data_o(bus_data),
     .bus_addr_o(bus_addr),
     .bus_we_o(bus_we),
     .bus_hb_o(bus_hb),
 
-    .bus_cs_o({ramio_cs, uart_cs, ram_cs, rom_cs})
+    .bus_cs_o({ramio_cs, uart_cs, ram_cs, rom_cs}),
+
+    .bus_req_o(bus_req),
+    .bus_gnt_i(bus_gnt),
+    .stall_o(stall)
 );
 
 rom rom0 (
     /* address bus */
-    .addr_i(bus_addr),
+    .addr_prt1_i(bus_addr),
+    .addr_prt2_i(rom_ptr2_addr),
     /* half-word/byte */
     .hb_i(bus_hb),
     /* data bus out */
-    .rdata_o(rom_data)
+    .rdata_prt1_o(rom_data),
+    .rdata_prt2_o(rom_ptr2_data)
 );
 
 ram ram0 (
     .clk_i(sysclk),
+
+    .ce_i(ram_cs),
+    .req_i(bus_req),
+    .gnt_o(bus_gnt),
+
     /* data bus in */
     .wdata_i(bus_data),
     /* address bus in */
     .addr_i(bus_addr),
     /* write enable */
-    .we_i(bus_we & ram_cs),
+    .we_i(bus_we),
     /* half-word/byte */
     .hb_i(bus_hb),
     /* load unsigned */

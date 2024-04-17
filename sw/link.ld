@@ -5,13 +5,13 @@ ENTRY(_start)
 MEMORY
 {
   ROM (rx) : ORIGIN = 0x00000000, LENGTH = 256
-  RAM (rw) : ORIGIN = 0x00000100, LENGTH = 256
+  RAM (rw) : ORIGIN = 0x01000000, LENGTH = 256
 }
 
 ROM_START_ADDRESS   = 0x00000000;       /* Must be the same value MEMORY region rom ORIGIN above. */
 ROM_SIZE            = 256;              /* Must be the same value MEMORY region rom LENGTH above. */
 
-RAM_START_ADDRESS   = 0x00000100;       /* Must be the same value MEMORY region ram ORIGIN above. */
+RAM_START_ADDRESS   = 0x01000000;       /* Must be the same value MEMORY region ram ORIGIN above. */
 RAM_SIZE            = 256;              /* Must be the same value MEMORY region ram LENGTH above. */
 
 STACK_SIZE          = 256;               /* needs to be calculated for your application */     
