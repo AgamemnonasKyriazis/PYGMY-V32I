@@ -1,22 +1,23 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Apr 13 17:36:31 2024
+[*] Sat Apr 20 18:26:26 2024
 [*]
 [dumpfile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/top_tb.vcd"
-[dumpfile_mtime] "Sat Apr 13 17:35:48 2024"
-[dumpfile_size] 11275354
+[dumpfile_mtime] "Sat Apr 20 18:24:53 2024"
+[dumpfile_size] 11645024
 [savefile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/mem.gtkw"
-[timestart] 0
-[size] 1722 1056
+[timestart] 8217000
+[size] 1418 866
 [pos] -138 -138
-*-16.000000 100500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-18.000000 8500000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.u0.
 [treeopen] top_tb.u0.e0.
+[treeopen] top_tb.u0.eram.
 [sst_width] 233
 [signals_width] 319
 [sst_expanded] 1
-[sst_vpaned_height] 296
+[sst_vpaned_height] 499
 @28
 top_tb.u0.sysclk
 @22
@@ -43,20 +44,30 @@ top_tb.u0.d0.mem_we_o
 @200
 -
 @22
-top_tb.u0.e0.a0.op1_i[31:0]
-top_tb.u0.e0.a0.op2_i[31:0]
-@200
--
-@22
 top_tb.u0.e0.rd_o[31:0]
 top_tb.u0.e0.l0.core_wdata_i[31:0]
 top_tb.u0.e0.l0.core_rdata_o[31:0]
 @200
 -
 @28
-top_tb.u0.ram0.ce_i
-top_tb.u0.ram0.req_i
-@29
-top_tb.u0.ram0.gnt_o
+top_tb.u0.eram.ce_i
+top_tb.u0.eram.req_i
+top_tb.u0.eram.gnt_o
+@22
+top_tb.u0.eram.addr_i[31:0]
+top_tb.u0.eram.wdata_i[7:0]
+top_tb.u0.eram.data_io[7:0]
+@23
+top_tb.u0.eram.rdata_o[31:0]
+@200
+-
+@28
+top_tb.u0.eram.state[1:0]
+@200
+-
+@28
+top_tb.u0.eram.r0.ce_ni
+top_tb.u0.eram.r0.we_ni
+top_tb.u0.eram.r0.oe_ni
 [pattern_trace] 1
 [pattern_trace] 0

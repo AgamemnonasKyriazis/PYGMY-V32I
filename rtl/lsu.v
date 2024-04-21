@@ -15,56 +15,53 @@ module lsu (
 
     /* TO BUS */
     /* bus data to core */
-    input wire [31:0] rom_data_i,
-    input wire [31:0] ram_data_i,
+    input wire [31:0] urom_data_i,
+    input wire [31:0] sram_data_i,
     input wire [31:0] uart_data_i,
+    input wire [31:0] eram_data_i,
     /* bus data from core */
-    output reg [31:0] bus_rdata_o, 
+    output wire [31:0] bus_rdata_o, 
     /* bus address */
-    output reg [31:0] bus_addr_o,
+    output wire [31:0] bus_addr_o,
     /* bus write enable */
-    output reg bus_we_o,
+    output wire bus_we_o,
     /* bus mode half-word-byte */
-    output reg [1:0] bus_hb_o,
+    output wire [1:0] bus_hb_o,
     /* bus chip select */
-    output reg [3:0] bus_cs_o,
+    output wire [7:0] bus_ce_o,
     /* bus request */
-    output reg bus_req_o,
+    output wire bus_req_o,
     /* bus granted */
     input wire bus_gnt_i
 );
 
 `include "Core.vh"
 
-always @(*)
-    if (bus_cs_o[1])
-        bus_req_o <= 1'b1;
-    else
-        bus_req_o <= 1'b0;
-
 always @(*) begin
-    bus_rdata_o <= core_wdata_i;
-    bus_we_o <= core_we_i;
-    bus_hb_o <= core_hb_i;
-    bus_addr_o <= {24'b0, core_addr_i[7:0]};
-end
-
-always @(*) begin
-    casez (core_addr_i)
-    ROM_BASE : core_rdata_o <= rom_data_i;
-    RAM_BASE : core_rdata_o <= ram_data_i;
-    UART_BASE : core_rdata_o <= uart_data_i;
-    default  : core_rdata_o <= rom_data_i;
+    case (1'b1)
+    bus_ce_o[0] : core_rdata_o <= urom_data_i;
+    bus_ce_o[1] : core_rdata_o <= sram_data_i;
+    bus_ce_o[2] : core_rdata_o <= uart_data_i;
+    bus_ce_o[3] : core_rdata_o <= eram_data_i;
+    default     : core_rdata_o <= 32'hzzzzzzzz;
     endcase
 end
 
-always @(*) begin
-    casez (core_addr_i)
-    ROM_BASE : bus_cs_o <= {1'b0, 1'b0, 1'b0, 1'b1};
-    RAM_BASE : bus_cs_o <= {1'b0, 1'b0, 1'b1, 1'b0};
-    UART_BASE : bus_cs_o <= {1'b0, 1'b1, 1'b0, 1'b0};
-    default  : bus_cs_o <= {1'b0, 1'b0, 1'b0, 1'b1};
-    endcase
-end
+assign bus_ce_o[0] = (UROM_BASE[31:24]  ==  core_addr_i[31:24]);
+assign bus_ce_o[1] = (SRAM_BASE[31:24]  ==  core_addr_i[31:24]);
+assign bus_ce_o[2] = (UART_BASE[31:24] ==  core_addr_i[31:24]);
+assign bus_ce_o[3] = (ERAM_BASE[31:24] ==  core_addr_i[31:24]);
+assign bus_ce_o[4] = 1'b0;
+assign bus_ce_o[5] = 1'b0;
+assign bus_ce_o[6] = 1'b0;
+assign bus_ce_o[7] = 1'b0;
+
+assign bus_we_o = core_we_i;
+assign bus_hb_o = core_hb_i;
+
+assign bus_rdata_o = core_wdata_i;
+assign bus_addr_o = {8'h00, core_addr_i[23:0]};
+
+assign bus_req_o = (bus_ce_o[1] | bus_ce_o[2] | bus_ce_o[3]);
 
 endmodule

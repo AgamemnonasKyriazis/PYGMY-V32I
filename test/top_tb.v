@@ -12,7 +12,7 @@ initial begin
     clk <= 0;
     #1
     rst_n <= 0;
-    #10000000
+    #20000000
     $finish;
 end
 

@@ -35,15 +35,16 @@ module execute (
     output wire reg_we_o,
 
     /* LSU (OUT) */
-    input wire [31:0] rom_data_i,
-    input wire [31:0] ram_data_i,
+    input wire [31:0] urom_data_i,
+    input wire [31:0] sram_data_i,
     input wire [31:0] uart_data_i,
+    input wire [31:0] eram_data_i,
 
     output wire [31:0] bus_data_o,
     output wire [31:0] bus_addr_o,
     output wire bus_we_o,
     output wire [1:0] bus_hb_o,
-    output wire [3:0] bus_cs_o,
+    output wire [7:0] bus_ce_o,
 
     output wire bus_req_o,
     input wire bus_gnt_i,
@@ -83,9 +84,10 @@ lsu l0 (
 
     /* TO BUS */
     /* bus data to core */
-    .rom_data_i(rom_data_i),
-    .ram_data_i(ram_data_i),
+    .urom_data_i(urom_data_i),
+    .sram_data_i(sram_data_i),
     .uart_data_i(uart_data_i),
+    .eram_data_i(eram_data_i),
     /* bus data from core */
     .bus_rdata_o(bus_data_o),
     /* bus address */
@@ -95,7 +97,7 @@ lsu l0 (
     /* bus mode half-word-byte */
     .bus_hb_o(bus_hb_o),
     /* bus chip select */
-    .bus_cs_o(bus_cs_o),
+    .bus_ce_o(bus_ce_o),
     /* bus request */
     .bus_req_o(bus_req_o),
     /* bus granted */
@@ -112,7 +114,7 @@ assign rd_o = (mem_re_i)? mem_rdata : alu_res;
 assign rd_ptr_o = rd_ptr_i;
 assign reg_we_o = reg_we_i;
 
-assign stall_o = (bus_cs_o[1] & bus_req_o & ~bus_gnt_i);
+assign stall_o = ((bus_ce_o[1] | bus_ce_o[3]) & bus_req_o & ~bus_gnt_i);
 
 always @(negedge clk_i)
     if (~stall_i)
