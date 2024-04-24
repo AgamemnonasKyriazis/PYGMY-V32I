@@ -9,7 +9,11 @@ module uart(
     input wire [7:0] uart_tx_wdata_i,
     output wire [7:0] uart_rx_rdata_o,
     output wire uart_tx_o,
-    output wire [1:0] uart_irq_o
+    output wire [1:0] uart_irq_o,
+
+    input wire uart_ce_i,
+    input wire uart_req_i,
+    output wire uart_gnt_o
 );
 
 localparam RX_FRAME_LEN = 'd9;
@@ -227,6 +231,8 @@ assign uart_tx_o = tx;
 assign rx = rx_sft_reg[0];
 
 assign uart_irq_o = {tx_fifo_full, ~rx_fifo_empty};
+
+assign uart_gnt_o = uart_req_i & uart_ce_i;
 
 always @(posedge tx_clk) begin
     if (~tx_fifo_empty & tx_state == TX_IDLE)

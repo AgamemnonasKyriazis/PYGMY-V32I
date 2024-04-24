@@ -55,6 +55,10 @@ wire [7:0] aluOp = (isAluReg | isAluImm)? funct3I : ADD;
 wire signed [31:0] rs1;
 wire signed [31:0] rs2;
 
+wire [4:0] rd_ptr = instruction_i[11:7];
+wire [4:0] rs1_ptr = instruction_i[19:15];
+wire [4:0] rs2_ptr = instruction_i[24:20];
+
 regfile registers (
     .clk_i(clk_i),
     .reg_write_en_i(reg_we_i),
@@ -87,10 +91,6 @@ wire isFollowed =
     (funct3I[5] & GT) |
     (funct3I[6] & LTU)|
     (funct3I[7] & GTU));
-
-wire [4:0] rd_ptr = instruction_i[11:7];
-wire [4:0] rs1_ptr = instruction_i[19:15];
-wire [4:0] rs2_ptr = instruction_i[24:20];
 
 wire [31:0] IMM_J = { {11{instruction_i[31]}}, instruction_i[31], instruction_i[19:12], instruction_i[20], instruction_i[30:21], 1'b0 };
 wire [31:0] IMM_B = { {19{instruction_i[31]}}, instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 1'b0 };

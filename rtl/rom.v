@@ -5,12 +5,16 @@ module rom (
     input wire [31:0] addr_prt2_i,
     input wire [1:0] hb_i,
     output reg [31:0] rdata_prt1_o,
-    output reg [31:0] rdata_prt2_o
+    output reg [31:0] rdata_prt2_o,
+
+    input wire urom_ce_i,
+    input wire urom_req_i,
+    output wire urom_gnt_o
 );
 
 wire [31:0] addr_1, addr_2;
 
-reg [31:0] rom [0:255];
+reg [31:0] rom [0:1024-1];
 
 initial begin
     $readmemh("../sw/image.hex", rom);
@@ -44,5 +48,7 @@ end
 
 assign addr_1 = addr_prt1_i >> 2;
 assign addr_2 = addr_prt2_i >> 2;
+
+assign urom_gnt_o = urom_req_i & urom_ce_i;
 
 endmodule

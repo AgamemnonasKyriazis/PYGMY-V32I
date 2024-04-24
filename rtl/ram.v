@@ -3,10 +3,11 @@
 module ram(
     /* system clock */
     input wire clk_i,
+    input wire rst_ni,
 
     input wire ce_i,
     input wire req_i,
-    output reg gnt_o,
+    output wire gnt_o,
 
     /* data bus in */
     input wire [31:0] wdata_i,
@@ -22,74 +23,95 @@ module ram(
     output reg [31:0] rdata_o
 );
 
-reg [31:0] addr;
-reg [3:0] en_vec;
+wire alignErr = ( wordEn & (addr_i[1] | addr_i[0]) ) |
+                ( halfEn & (addr_i[0]) );
 
-reg [7:0] mem0 [0:255];
-reg [7:0] mem1 [0:255];
-reg [7:0] mem2 [0:255];
-reg [7:0] mem3 [0:255];
+wire wordEn =  hb_i[1] & ~hb_i[0];
+wire halfEn = ~hb_i[1] &  hb_i[0];
+wire byteEn = ~hb_i[1] & ~hb_i[0];
 
+wire [31:0] addr = addr_i >> 2;
+
+reg [31:0] sram [0:1024-1];
+
+integer i;
 initial begin
-    gnt_o <= 1'b0;
+    for (i = 0; i < 1024; i = i + 1)
+        sram[i] = 32'hef;
 end
 
-always @(posedge clk_i) begin
-    gnt_o <= req_i & ce_i;
-end
+reg [2:0] state;
+reg [2:0] state_next;
+
+localparam [2:0] IDLE = 3'b001;
+localparam [2:0] BUSY = 3'b010;
+localparam [2:0] RSTS = 3'b100;
+
+always @(posedge clk_i, negedge rst_ni)
+    if (~rst_ni)
+        state <= IDLE;
+    else
+        state <= state_next;
+
+always @(*)
+    case (state)
+    IDLE : state_next <= (req_i & ce_i)? BUSY : IDLE;
+    BUSY : state_next <= RSTS;
+    RSTS : state_next <= IDLE;
+    default : state_next <= IDLE;
+    endcase
+
+assign gnt_o = req_i & ce_i & state[2];
 
 always @(posedge clk_i) begin
-    if (req_i & ce_i & we_i) begin
-        case (en_vec)
-        4'b0001 : mem0[addr] <= wdata_i[7:0];
-        4'b0010 : mem1[addr] <= wdata_i[7:0];
-        4'b0100 : mem2[addr] <= wdata_i[7:0];
-        4'b1000 : mem3[addr] <= wdata_i[7:0];
-        4'b0011 : {mem1[addr], mem0[addr]} <= wdata_i[15:0];
-        4'b1100 : {mem3[addr], mem2[addr]} <= wdata_i[15:0];
-        4'b1111 : {mem3[addr], mem2[addr], mem1[addr], mem0[addr]} <= wdata_i;
-        default : {mem3[addr], mem2[addr], mem1[addr], mem0[addr]} <= wdata_i;
+    if (req_i & ce_i & we_i & (~alignErr)) begin
+    case (1'b1)
+    byteEn : begin
+        case (addr_i[1:0])
+        2'b00 : sram[addr][7:0]   <= wdata_i[7:0];
+        2'b01 : sram[addr][15:8]  <= wdata_i[7:0];
+        2'b10 : sram[addr][23:16] <= wdata_i[7:0];
+        2'b11 : sram[addr][31:24] <= wdata_i[7:0];
         endcase
+    end
+    halfEn : begin
+        case (addr_i[1])
+        1'b0 : sram[addr][15:0]  <= wdata_i[15:0];
+        1'b1 : sram[addr][31:16] <= wdata_i[15:0];
+        endcase
+    end
+    wordEn : begin
+        sram[addr] <= wdata_i;
+    end
+    endcase
     end
 end
 
-always @(*) begin
-    if (req_i & ce_i & (~we_i)) begin
-        case (en_vec)
-        4'b0001 : rdata_o <= (uload_i)? { 24'b0, mem0[addr] } : { {24{mem0[addr][7]}}, mem0[addr] };
-        4'b0010 : rdata_o <= (uload_i)? { 24'b0, mem1[addr] } : { {24{mem1[addr][7]}}, mem1[addr] };
-        4'b0100 : rdata_o <= (uload_i)? { 24'b0, mem2[addr] } : { {24{mem2[addr][7]}}, mem2[addr] };
-        4'b1000 : rdata_o <= (uload_i)? { 24'b0, mem3[addr] } : { {24{mem3[addr][7]}}, mem3[addr] };
-        4'b0011 : rdata_o <= (uload_i)? { 16'b0, mem1[addr], mem0[addr] } : { {16{mem1[addr][7]}}, mem1[addr], mem0[addr] };
-        4'b1100 : rdata_o <= (uload_i)? { 16'b0, mem3[addr], mem2[addr] } : { {16{mem3[addr][7]}}, mem3[addr], mem2[addr] };
-        4'b1111 : rdata_o <= {mem3[addr], mem2[addr], mem1[addr], mem0[addr]};
-        default : rdata_o <= {mem3[addr], mem2[addr], mem1[addr], mem0[addr]};
+always @(posedge clk_i) begin
+    if (req_i & ce_i & (~we_i) & (~alignErr)) begin
+    case (1'b1)
+    byteEn : begin
+        case (addr_i[1:0])
+        2'b00 : rdata_o <= { 24'b0, sram[addr][7:0]   };
+        2'b01 : rdata_o <= { 24'b0, sram[addr][15:8]  };
+        2'b10 : rdata_o <= { 24'b0, sram[addr][23:16] };
+        2'b11 : rdata_o <= { 24'b0, sram[addr][31:24] };
+        endcase 
+    end
+    halfEn : begin
+        case (addr_i[1])
+        1'b0 : rdata_o <= { 16'b0, sram[addr][15:0]  };
+        1'b1 : rdata_o <= { 16'b0, sram[addr][31:16] };
         endcase
+    end
+    wordEn : begin
+        rdata_o <= sram[addr][31:0];
+    end
+    endcase
     end
     else begin
-        rdata_o <= 32'hxxxxxxxx;
+        rdata_o <= 32'hzzzzzzzz;
     end
 end
-
-always @(*) begin
-    case (hb_i)
-    2'b10 : en_vec <= 4'b1111;
-    2'b00 :
-        case (addr_i[1:0])
-        2'b00 : en_vec <= 4'b0001;
-        2'b01 : en_vec <= 4'b0010;
-        2'b10 : en_vec <= 4'b0100;
-        2'b11 : en_vec <= 4'b1000;
-        endcase
-    2'b01 :
-        case (addr_i[1])
-        1'b0 : en_vec <= 4'b0011;
-        1'b1 : en_vec <= 4'b1100;
-        endcase
-    2'b11 : en_vec <= 4'b0000; 
-    endcase
-end
-
-always @(*) addr <= addr_i >> 2;
 
 endmodule

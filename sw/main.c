@@ -9,7 +9,7 @@ volatile uint8_t* const uart = (volatile uint8_t*)(UART);
 
 volatile uint8_t* const eram = (volatile uint8_t*)(ERAM);
 
-uint8_t const msg[] = "ABC!\r\n";
+uint8_t const msg[] = "Hello World!\r\n";
 
 int main()
 {

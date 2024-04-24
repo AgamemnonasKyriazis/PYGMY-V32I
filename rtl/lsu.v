@@ -47,14 +47,7 @@ always @(*) begin
     endcase
 end
 
-assign bus_ce_o[0] = (UROM_BASE[31:24]  ==  core_addr_i[31:24]);
-assign bus_ce_o[1] = (SRAM_BASE[31:24]  ==  core_addr_i[31:24]);
-assign bus_ce_o[2] = (UART_BASE[31:24] ==  core_addr_i[31:24]);
-assign bus_ce_o[3] = (ERAM_BASE[31:24] ==  core_addr_i[31:24]);
-assign bus_ce_o[4] = 1'b0;
-assign bus_ce_o[5] = 1'b0;
-assign bus_ce_o[6] = 1'b0;
-assign bus_ce_o[7] = 1'b0;
+assign bus_ce_o = 32'b1 << core_addr_i[31:24];
 
 assign bus_we_o = core_we_i;
 assign bus_hb_o = core_hb_i;
@@ -62,6 +55,6 @@ assign bus_hb_o = core_hb_i;
 assign bus_rdata_o = core_wdata_i;
 assign bus_addr_o = {8'h00, core_addr_i[23:0]};
 
-assign bus_req_o = (bus_ce_o[1] | bus_ce_o[2] | bus_ce_o[3]);
+assign bus_req_o = (|bus_ce_o);
 
 endmodule

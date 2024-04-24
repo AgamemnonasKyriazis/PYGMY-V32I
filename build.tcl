@@ -20,12 +20,14 @@ read_xdc "arty.xdc"
 # synth
 synth_design -verbose -top "top" -part "xc7a35tcpg236-1"
 
+opt_design
+
 report_utilization -file build/synth/reports/utilization
 
 report_utilization -hierarchical -file build/synth/reports/hierarchical_utilization
 
-#opt_design
 place_design
+
 route_design
 
 #write bitstream

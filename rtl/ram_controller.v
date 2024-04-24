@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 
-//`define TEST
+`define TEST
+//`undef TEST
+
 `ifdef TEST
 module ramio (
     input wire ce_ni,
@@ -11,7 +13,7 @@ module ramio (
     inout wire [7:0] data_io
 );
 
-reg [7:0] sram [0:1023];
+reg [7:0] sram [0:1024-1];
 
 integer i;
 initial begin
@@ -44,16 +46,19 @@ module ram_controller(
     inout wire [7:0] data_io
 );
 
-localparam [1:0] IDLE = 2'b00;
-localparam [1:0] SETD = 2'b01;
-localparam [1:0] SETS = 2'b10;
+localparam [2:0] IDLE = 3'b001;
+localparam [2:0] SETD = 3'b010;
+localparam [2:0] RSTS = 3'b100;
 
-reg [1:0] state;
-reg [1:0] state_next;
+reg [2:0] state;
+reg [2:0] state_next;
+
+wire rstsBit, setdBit, idleBit;
+assign {rstsBit, setdBit, idleBit} = state;
 
 assign ce_no = ~ce_i;
-assign we_no = (state == SETD)? ~we_i : 1'b1;
-assign oe_no = (state == SETD)?  we_i : 1'b0;
+assign we_no = (setdBit)? ~we_i : 1'b1;
+assign oe_no = (setdBit)?  we_i : 1'b0;
 
 always @(posedge clk_i, negedge rst_ni) begin
     if (~rst_ni)
@@ -65,14 +70,15 @@ end
 always @(*) begin
     case (state)
     IDLE : state_next <= (ce_i & req_i)? SETD : IDLE;
-    SETD : state_next <= SETS;
-    SETS : state_next <= IDLE;
+    SETD : state_next <= RSTS;
+    RSTS : state_next <= IDLE;
+    default : state_next <= IDLE;
     endcase
 end
 
 assign data_io = (we_no)? 8'hzz : wdata_i;
 
-assign gnt_o = (state == SETS) & ce_i & req_i;
+assign gnt_o = rstsBit & ce_i & req_i;
 assign rdata_o = data_io;
 
 `ifdef TEST

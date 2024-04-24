@@ -49,9 +49,9 @@ wire [31:0] eram_data;
 wire bus_req;
 wire bus_gnt;
 
-wire urom_gnt = 1'b0;
+wire urom_gnt;
 wire sram_gnt;
-wire uart_gnt = 1'b0;
+wire uart_gnt;
 wire eram_gnt;
 
 wire urom_ce;
@@ -168,11 +168,16 @@ rom rom0 (
     .hb_i(bus_hb),
     /* data bus out */
     .rdata_prt1_o(urom_data),
-    .rdata_prt2_o(rom_ptr2_data)
+    .rdata_prt2_o(rom_ptr2_data),
+
+    .urom_ce_i(urom_ce),
+    .urom_req_i(bus_req),
+    .urom_gnt_o(urom_gnt)
 );
 
 ram ram0 (
     .clk_i(sysclk),
+    .rst_ni(rst_n),
 
     .ce_i(sram_ce),
     .req_i(bus_req),
@@ -208,8 +213,13 @@ uart uart0 (
     /* serial tx out */
     .uart_tx_o(uart_rxd_out),
     /* interrupt request vector */
-    .uart_irq_o(uart_irq)
+    .uart_irq_o(uart_irq),
+
+    .uart_ce_i(uart_ce),
+    .uart_req_i(bus_req),
+    .uart_gnt_o(uart_gnt)
 );
+
 
 ram_controller eram (
     .clk_i(sysclk),

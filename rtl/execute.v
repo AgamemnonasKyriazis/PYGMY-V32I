@@ -114,7 +114,7 @@ assign rd_o = (mem_re_i)? mem_rdata : alu_res;
 assign rd_ptr_o = rd_ptr_i;
 assign reg_we_o = reg_we_i;
 
-assign stall_o = ((bus_ce_o[1] | bus_ce_o[3]) & bus_req_o & ~bus_gnt_i);
+assign stall_o = ((|bus_ce_o) & bus_req_o & ~bus_gnt_i);
 
 always @(negedge clk_i)
     if (~stall_i)
