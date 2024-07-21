@@ -1,127 +1,76 @@
 `timescale 1ns / 1ps
 
 module execute (
-    input wire clk_i,
-    input wire rst_ni,
-
-    input wire [7:0] core_state_i,
-    input wire [31:0] instruction_i,
-    input wire [31:0] program_pointer_i,
-    input wire stall_i,
-    output wire [31:0] program_pointer_o,
-    output reg [31:0] instruction_o,
-
-    /* EXE operands */
-    input wire [4:0] rd_ptr_i,
-    input wire [31:0] rs1_i,
-    input wire [31:0] rs2_i,
-    input wire [31:0] imm_i,
-
-    /* ALU control */
-    input wire [7:0] funct3I_i,
-    input wire [6:0] funct7_i,
-    input wire alu_src_i,
+    input  wire [31:0]  i_CSR_RD,
+    input  wire         i_CSR,
+    /*-----------------------------------*/
+    input  wire         i_CLK,
+    input  wire         i_RSTn,
+    input  wire         i_EN,
     
-    /* WB control (IN) */
-    input wire reg_we_i,
-    input wire mem_we_i,
-    input wire mem_re_i,
-    input wire [1:0] mem_hb_i,
-    input wire mem_ul_i,
-
-    /* WB control (OUT) */
-    output wire [31:0] rd_o,
-    output wire [4:0] rd_ptr_o,
-    output wire reg_we_o,
-
-    /* LSU (OUT) */
-    input wire [31:0] urom_data_i,
-    input wire [31:0] sram_data_i,
-    input wire [31:0] uart_data_i,
-    input wire [31:0] eram_data_i,
-
-    output wire [31:0] bus_data_o,
-    output wire [31:0] bus_addr_o,
-    output wire bus_we_o,
-    output wire [1:0] bus_hb_o,
-    output wire [7:0] bus_ce_o,
-
-    output wire bus_req_o,
-    input wire bus_gnt_i,
-    output wire stall_o
+    input  wire [7:0]   i_FUNC3I,
+    input  wire [6:0]   i_FUNCT7,
+    input  wire [3:0]   i_ALU_OP1_SEL,
+    input  wire [3:0]   i_ALU_OP2_SEL,
+    input  wire [4:0]   i_RD_PTR,
+    input  wire [31:0]  i_RS1,
+    input  wire [31:0]  i_RS2,
+    input  wire [31:0]  i_IMM,
+    
+    input  wire         i_REG_WE,
+    input  wire         i_MEM_WE,
+    input  wire         i_MEM_RE,
+    input  wire [1:0]   i_HB,
+    input  wire         i_ULOAD,
+    input  wire [31:0]  i_PC,
+    
+    output wire [31:0]  o_RD,
+    output wire [4:0]   o_RD_PTR,
+    output wire         o_REG_WE,
+    
+    output wire [31:0]  o_MEM_ADDR,
+    input  wire [31:0]  i_MEM_RDATA
+    /*-----------------------------------*/
 );
 
-wire [31:0] alu_op1, alu_op2, alu_res;
+reg  [31:0] AluOp1;
+reg  [31:0] AluOp2;
+wire [31:0] AluRes;
+wire [8:0]  AluOpcode   = {i_FUNCT7[6], i_FUNC3I};
 
-wire [31:0] mem_addr, mem_wdata, mem_rdata;
+assign o_MEM_ADDR   =   AluRes;
 
-wire load_instruction;
+/*--------------------------------------------- ALU -----------------------------------------------*/
 
-alu a0 (
-    /* ALU OP1 */
-    .op1_i(alu_op1),
-    /* ALU OP2 */
-    .op2_i(alu_op2),
-    /* ALU OPCODE */
-    .opcode_i(funct3I_i),
-    .alu_op_i(funct7_i[6]),
-    /* ALU RES */
-    .res_o(alu_res)
+alu ALU (
+    .i_OP1(AluOp1),
+    .i_OP2(AluOp2),
+    .i_OPCODE(AluOpcode),
+    .o_RES(AluRes)
 );
 
-lsu l0 (
-    /* TO CORE */
-    /* core data to bus */
-    .core_wdata_i(mem_wdata),
-    /* core address */
-    .core_addr_i(mem_addr),
-    /* core write enable */
-    .core_we_i(mem_we_i),
-    /* core mode half-word-byte */
-    .core_hb_i(mem_hb_i),
-    /* core data data from bus */
-    .core_rdata_o(mem_rdata),
+always @(*) begin : Op1Selector
+    case (i_ALU_OP1_SEL)
+    4'b0001 :   AluOp1 <= i_RS1;
+    4'b0010 :   AluOp1 <= i_PC;
+    4'b0100 :   AluOp1 <= 32'd0;
+    4'b1000 :   AluOp1 <= 32'd0;
+    default :   AluOp1 <= i_RS1;
+    endcase
+end
 
-    /* TO BUS */
-    /* bus data to core */
-    .urom_data_i(urom_data_i),
-    .sram_data_i(sram_data_i),
-    .uart_data_i(uart_data_i),
-    .eram_data_i(eram_data_i),
-    /* bus data from core */
-    .bus_rdata_o(bus_data_o),
-    /* bus address */
-    .bus_addr_o(bus_addr_o),
-    /* bus write enable */
-    .bus_we_o(bus_we_o),
-    /* bus mode half-word-byte */
-    .bus_hb_o(bus_hb_o),
-    /* bus chip select */
-    .bus_ce_o(bus_ce_o),
-    /* bus request */
-    .bus_req_o(bus_req_o),
-    /* bus granted */
-    .bus_gnt_i(bus_gnt_i)
-);
+always @(*) begin : Op2Selector
+    case (i_ALU_OP2_SEL)
+    4'b0001 :   AluOp2 <= i_RS2;
+    4'b0010 :   AluOp2 <= i_IMM;
+    4'b0100 :   AluOp2 <= 32'd0;
+    4'b1000 :   AluOp2 <= 32'd0;
+    default :   AluOp2 <= i_RS2;
+    endcase
+end
 
-assign alu_op1 = rs1_i;
-assign alu_op2 = (alu_src_i)? imm_i : rs2_i;
-
-assign mem_wdata = rs2_i;
-assign mem_addr = ((~mem_re_i) & (~mem_we_i))? program_pointer_i : alu_res;
-
-assign rd_o = (mem_re_i)? mem_rdata : alu_res;
-assign rd_ptr_o = rd_ptr_i;
-assign reg_we_o = reg_we_i;
-
-assign stall_o = ((|bus_ce_o) & bus_req_o & ~bus_gnt_i);
-
-always @(negedge clk_i)
-    if (~stall_i)
-        instruction_o <= instruction_i;
-    else
-        instruction_o <= 32'd0;
-
-assign program_pointer_o = program_pointer_i;
+assign o_RD     = (i_MEM_RE)? i_MEM_RDATA : (i_CSR)? i_CSR_RD : AluRes;
+assign o_RD_PTR = i_RD_PTR;
+assign o_REG_WE = i_REG_WE;
 
 endmodule

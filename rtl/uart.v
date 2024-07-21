@@ -6,8 +6,8 @@ module uart(
     input wire uart_rx_i,
     input wire uart_we_i,
     input wire uart_re_i,
-    input wire [7:0] uart_tx_wdata_i,
-    output wire [7:0] uart_rx_rdata_o,
+    input wire [31:0] uart_tx_wdata_i,
+    output wire [31:0] uart_rx_rdata_o,
     output wire uart_tx_o,
     output wire [1:0] uart_irq_o,
 
@@ -129,12 +129,12 @@ always @(posedge clk_i, negedge rst_ni) begin: TxClk
     end
 end
 
-always @(posedge rx_clk, negedge rst_ni) begin: RxSyncStateMachine
+always @(posedge clk_i, negedge rst_ni) begin: RxSyncStateMachine
     if (~rst_ni) begin
         rx_state <= RX_IDLE;
         rx_frame_count <= 'b0;
     end
-    else begin
+    else if (rx_clk) begin
         rx_state = rx_state_next;
         case(rx_state)
         RX_IDLE : begin
@@ -151,14 +151,14 @@ always @(posedge rx_clk, negedge rst_ni) begin: RxSyncStateMachine
     end
 end
 
-always @(posedge tx_clk, negedge rst_ni) begin: TxSyncStateMachine
+always @(posedge clk_i, negedge rst_ni) begin: TxSyncStateMachine
     if (~rst_ni) begin
         tx_state <= TX_IDLE;
         tx_frame_buf <= ~'b0;
         tx_frame_count <= 'b0;
         tx <= 1'b1;
     end
-    else begin
+    else if (tx_clk) begin
         tx_state <= tx_state_next;
         case(tx_state)
         TX_IDLE : begin
@@ -213,10 +213,10 @@ always @(posedge clk_i, negedge rst_ni) begin
         tx_start = ~tx_fifo_empty;
 end
 
-assign tx_fifo_data_i = uart_tx_wdata_i;
-assign uart_rx_rdata_o = rx_fifo_data_o;
+assign tx_fifo_data_i = uart_tx_wdata_i[7:0];
+assign uart_rx_rdata_o = {24'b0, rx_fifo_data_o};
 
-assign rx_fifo_we = rx_state == RX_DONE;
+assign rx_fifo_we = (rx_state == RX_DONE) & rx_clk;
 assign rx_fifo_re = uart_re_i;
 
 assign tx_fifo_we = uart_we_i;

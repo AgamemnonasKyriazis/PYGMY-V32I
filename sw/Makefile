@@ -1,6 +1,6 @@
 # Variables
 CC = riscv32-unknown-elf-gcc
-CFLAGS = -march=rv32i -mabi=ilp32 -O0
+CFLAGS = -march=rv32i_zicsr -mabi=ilp32 -O0
 LDFLAGS = -nostartfiles -nostdlib -mno-strict-align -mcmodel=medany -fno-builtin -T link.ld
 OBJCOPY = riscv32-unknown-elf-objcopy
 TARGET = main

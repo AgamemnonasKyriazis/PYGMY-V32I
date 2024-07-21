@@ -1,71 +1,80 @@
 `timescale 1ns / 1ps
 
 module decode(
-    input wire clk_i,
-    input wire rst_ni,
-
-    input wire [7:0] core_state_i,
-    input wire [31:0] instruction_i,
-    input wire stall_i,
-    output reg [31:0] program_pointer_o,
-
-    /* WB */
-    input wire [31:0] rd_i,
-    input wire [4:0] rd_ptr_i,
-    input wire reg_we_i, 
     
-    /* EXE operands */
-    output reg [31:0] rs1_o,
-    output reg [31:0] rs2_o,
-    output reg [31:0] imm_o,
-    output reg [4:0] rd_ptr_o,
-    
-    /* ALU control */
-    output reg [7:0] funct3I_o,
-    output reg [6:0] funct7_o,
-    output reg alu_src_o,
+    input  wire  [31:0]  i_MEPC,
+    input  wire          i_IRQ,
+    input  wire  [31:0]  i_HANDLER_BASE,
+    output wire          o_MODE,
 
-    /* WE/RE control */
-    output reg reg_we_o,
-    output reg mem_we_o,
-    output reg mem_re_o,
-    output reg [1:0] hb_o,
-    output reg ul_o
+    /*-----------------------------------*/
+    input wire          i_CLK,
+    input wire          i_RSTn,
+
+    input wire  [31:0]  i_INSTRUCTION,
+    input wire          i_EN,
+    
+    input wire  [31:0]  i_RD,
+    input wire  [4:0]   i_RD_PTR,
+    input wire          i_REG_WE,
+
+    output reg  [7:0]   o_FUNC3I,
+    output reg  [6:0]   o_FUNCT7,
+    output reg  [3:0]   o_ALU_OP1_SEL,
+    output reg  [3:0]   o_ALU_OP2_SEL,
+    output reg  [4:0]   o_RD_PTR,
+
+    output reg  [31:0]  o_RS1,
+    output reg  [31:0]  o_RS2,
+    output reg  [31:0]  o_IMM,
+
+    output wire         o_REG_WE,
+    output wire         o_MEM_WE,
+    output wire         o_MEM_RE,
+    output wire [1:0]   o_HB,
+    output wire         o_ULOAD,
+    output wire         o_CSR,
+
+    output wire [31:0]  o_PC,
+    output reg  [31:0]  o_PC_OLD
+    /*-----------------------------------*/
 );
 
 `include "Core.vh"
 `include "Instruction_Set.vh"
-`include "ALU_Instructions.vh"
 
-wire [6:0] opcode = instruction_i[6:0];
-wire isAluReg   = (opcode == ALU_R);
-wire isAluImm   = (opcode == ALU_I);
-wire isLoad     = (opcode == LOAD);
-wire isStore    = (opcode == STORE);
-wire isBranch   = (opcode == BRANCH);
-wire isJal      = (opcode == JAL);
-wire isLui      = (opcode == LUI);
-wire isAuipc    = (opcode == AUIPC);     
+wire [6:0] opcode   = i_INSTRUCTION[6:0];
 
-wire [2:0] funct3 = instruction_i[14:12];
-wire [6:0] funct7 = instruction_i[31:25];
-wire [7:0] funct3I = 8'b00000001 << funct3;
-wire [7:0] aluOp = (isAluReg | isAluImm)? funct3I : ADD;
+wire isAluReg       = (opcode == ALU_R);
+wire isAluImm       = (opcode == ALU_I);
+wire isLoad         = (opcode == LOAD);
+wire isStore        = (opcode == STORE);
+wire isBranch       = (opcode == BRANCH);
+wire isJal          = (opcode == JAL);
+wire isLui          = (opcode == LUI);
+wire isAuipc        = (opcode == AUIPC);
+wire isEcall        = (opcode == ECALL);
+wire isJalr         = (opcode == JALR);
+wire isMret         = isEcall & (IMM_R == 32'h302);
+
+wire [2:0] funct3   = i_INSTRUCTION[14:12];
+wire [6:0] funct7   = i_INSTRUCTION[31:25];
+wire [7:0] funct3I  = 8'b00000001 << funct3;
 
 wire signed [31:0] rs1;
 wire signed [31:0] rs2;
 
-wire [4:0] rd_ptr = instruction_i[11:7];
-wire [4:0] rs1_ptr = instruction_i[19:15];
-wire [4:0] rs2_ptr = instruction_i[24:20];
+wire [4:0] rd_ptr   = i_INSTRUCTION[11:7];
+wire [4:0] rs1_ptr  = i_INSTRUCTION[19:15];
+wire [4:0] rs2_ptr  = i_INSTRUCTION[24:20];
 
 regfile registers (
-    .clk_i(clk_i),
-    .reg_write_en_i(reg_we_i),
+    .clk_i(i_CLK),
+    .reg_write_en_i(i_REG_WE),
     .rs1_ptr_i(rs1_ptr),
     .rs2_ptr_i(rs2_ptr),
-    .rd_ptr_i(rd_ptr_i),
-    .rd_i(rd_i),
+    .rd_ptr_i(i_RD_PTR),
+    .rd_i(i_RD),
     .rs1_o(rs1),
     .rs2_o(rs2)
 );
@@ -82,7 +91,7 @@ wire GT  = ~LT;
 wire LTU = $unsigned(rs1) < $unsigned(rs2);
 /* Greater or Equal (unsigned) */
 wire GTU = ~LTU;
-
+/* Branch is Followed */
 wire isFollowed = 
     (isBranch & 
     (funct3I[0] & EQ) |
@@ -92,159 +101,235 @@ wire isFollowed =
     (funct3I[6] & LTU)|
     (funct3I[7] & GTU));
 
-wire [31:0] IMM_J = { {11{instruction_i[31]}}, instruction_i[31], instruction_i[19:12], instruction_i[20], instruction_i[30:21], 1'b0 };
-wire [31:0] IMM_B = { {19{instruction_i[31]}}, instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 1'b0 };
-wire [31:0] IMM_U = { instruction_i[31:12], 12'b0 };
-wire [31:0] IMM_R = { {20{instruction_i[31]}}, instruction_i[31:20] };
-wire [31:0] IMM_S = { {20{instruction_i[31]}}, instruction_i[31:25], instruction_i[11:7] };
-wire [31:0] SHAMT = { 25'b0, instruction_i[24:20] };
+wire [31:0] IMM_J   = { {11{i_INSTRUCTION[31]}}, i_INSTRUCTION[31], i_INSTRUCTION[19:12], i_INSTRUCTION[20], i_INSTRUCTION[30:21], 1'b0 };
+wire [31:0] IMM_B   = { {19{i_INSTRUCTION[31]}}, i_INSTRUCTION[31], i_INSTRUCTION[7], i_INSTRUCTION[30:25], i_INSTRUCTION[11:8], 1'b0 };
+wire [31:0] IMM_U   = { i_INSTRUCTION[31:12], 12'b0 };
+wire [31:0] IMM_R   = { {20{i_INSTRUCTION[31]}}, i_INSTRUCTION[31:20] };
+wire [31:0] IMM_S   = { {20{i_INSTRUCTION[31]}}, i_INSTRUCTION[31:25], i_INSTRUCTION[11:7] };
+wire [31:0] SHAMT   = { 25'b0, i_INSTRUCTION[24:20] };
+wire [31:0] CSR     = { 20'b0, i_INSTRUCTION[31:20] };
 
-wire [31:0] program_pointer_incr = (isJal)? IMM_J : (isFollowed & isBranch)? IMM_B : 32'd4;
+reg  [31:0] pc;
+wire [31:0] pc_incr = (isJal)? IMM_J : (isFollowed & isBranch)? IMM_B : 32'd4;
 
-always @(posedge clk_i) begin : ProgramPointer
-    if (~stall_i) begin
-        case (core_state_i)
-        BOOT : program_pointer_o <= 32'd0;
-        RUN  : program_pointer_o <= program_pointer_o + program_pointer_incr;
-        endcase
-    end
+assign o_PC = pc;
+
+localparam USER     = 1'b0;
+localparam MACHINE  = 1'b1;
+reg mode;
+
+always @(posedge i_CLK) begin : Mode
+    if (~i_RSTn)
+        mode <= USER;
+    else if (i_IRQ && (mode == USER))
+        mode <= MACHINE;
+    else if (isMret)
+        mode <= USER;
+    else
+        mode <= mode;
 end
 
-always @(posedge clk_i) begin : SignalControl
-    if (~stall_i) begin
+always @(posedge i_CLK) begin : ProgramPointer
+    if (~i_RSTn) begin
+        pc   <= 32'd0;
+    end
+    else if (i_IRQ && (mode == USER))
+        pc   <= i_HANDLER_BASE;
+    else if (i_EN)
+        if (isMret)
+            pc   <= i_MEPC;
+        else if (isJalr)
+            pc   <= rs1 + IMM_R;
+        else
+            pc   <= pc + pc_incr;
+    else
+        pc   <= pc;
+end
+
+reg         reg_we;
+reg         mem_we;
+reg         mem_re;
+reg [1:0]   hb;
+reg         uload;
+reg         csr;
+
+assign o_REG_WE = reg_we;
+assign o_MEM_WE = mem_we;
+assign o_MEM_RE = mem_re;
+assign o_HB     = hb;
+assign o_ULOAD  = uload;
+assign o_CSR    = csr;
+
+always @(posedge i_CLK) begin : SignalControl
+    if (~i_RSTn) begin
+        reg_we  <= 1'b0;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= 2'b00;
+        uload   <= 1'b0;
+        csr     <= 1'b0;
+    end
+    else if (i_IRQ && (mode == USER)) begin
+        reg_we  <= 1'b0;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= 2'b00;
+        uload   <= 1'b0;
+        csr     <= 1'b0;
+    end
+    else if (i_EN) begin
     case (1'b1)
     isAluReg   : begin
-        reg_we_o  <= 1'b1;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b0;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isAluImm    : begin
-        reg_we_o  <= 1'b1;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b1;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isLoad      : begin
-        reg_we_o  <= 1'b1;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b1;
-        alu_src_o <= 1'b1;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b1;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isStore     : begin
-        reg_we_o  <= 1'b0;
-        mem_we_o  <= 1'b1;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b1;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b0;
+        mem_we  <= 1'b1;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isBranch    : begin
-        reg_we_o  <= 1'b0;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b0;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b0;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isJal       : begin
-        reg_we_o  <= 1'b1;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b1;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
+    end
+    isJalr      : begin
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isLui       : begin
-        reg_we_o  <= 1'b1;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b1;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
     end
     isAuipc     : begin
-        reg_we_o  <= 1'b1;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b1;
-        hb_o <= funct3[1:0];
-        ul_o <= funct3[2];
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b0;
+    end
+    isEcall     : begin
+        reg_we  <= 1'b1;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= funct3[1:0];
+        uload   <= funct3[2];
+        csr     <= 1'b1;
     end
     default : begin
-        reg_we_o  <= 1'b0;
-        mem_we_o  <= 1'b0;
-        mem_re_o  <= 1'b0;
-        alu_src_o <= 1'b0;
-        hb_o <= 2'b00;
-        ul_o <= 1'b0;
+        reg_we  <= 1'b0;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= 2'b00;
+        uload   <= 1'b0;
+        csr     <= 1'b0;
     end
     endcase
     end
-end
-
-always @(posedge clk_i) begin
-    if (~stall_i) begin
-    funct3I_o <= aluOp;
-    funct7_o <= (isAluReg)? funct7 : 7'd0;
+    else begin
+        reg_we  <= reg_we;
+        mem_we  <= mem_we;
+        mem_re  <= mem_re;
+        hb      <= hb;
+        uload   <= uload;
+        csr     <= csr;
     end
 end
 
-always @(posedge clk_i) begin : ImmSelector
-    if (~stall_i) begin
-    case (1'b1)
-    isLoad   : imm_o <= IMM_R;
-    isStore  : imm_o <= IMM_S;
-    isJal    : imm_o <= 32'd4;
-    isLui    : imm_o <= IMM_U;
-    isAuipc  : imm_o <= IMM_U;
-    default  : imm_o <= IMM_R; 
-    endcase
+always @(posedge i_CLK) begin : FunctALU
+    if (~i_RSTn) begin
+        o_FUNC3I <= 8'b00000001;
+        o_FUNCT7 <= 7'd0;
+        o_ALU_OP1_SEL <= 4'd0;
+        o_ALU_OP2_SEL <= 4'd0;
+    end
+    else if (i_EN) begin
+        o_FUNC3I <= (isAluReg | isAluImm)? funct3I : 8'b00000001;
+        o_FUNCT7 <= (isAluReg)? funct7 : 7'd0;
+        o_ALU_OP1_SEL <= {1'b0, isLui, isJal|isJalr|isAuipc, ~(isLui|isJal|isJalr|isAuipc)};
+        o_ALU_OP2_SEL <= {1'b0, 1'b0, isAluImm|isLoad|isStore|isJal|isJalr|isLui|isAuipc, isAluReg};
     end
 end
 
-always @(posedge clk_i) begin : Op1Selector
-    if (~stall_i) begin
-    case (1'b1)
-    isJal   :   rs1_o <= program_pointer_o;
-    isAuipc :   rs1_o <= program_pointer_o;
-    isLui   :   rs1_o <= 32'd0;
-    default :   rs1_o <= rs1;
-    endcase
+always @(posedge i_CLK) begin : OutRegs
+    if (~i_RSTn) begin
+        o_RS1       <= 32'd0;
+        o_RS2       <= 32'd0;
+        o_IMM       <= 32'd0;
+        o_RD_PTR    <= 5'd0;
+        o_PC_OLD    <= 32'd0;
+    end
+    else if (i_IRQ && (mode == USER)) begin
+        o_RS1       <= 32'd0;
+        o_RS2       <= 32'd0;
+        o_IMM       <= 32'd0;
+        o_RD_PTR    <= 5'd0;
+        o_PC_OLD    <= pc;
+    end
+    else if (i_EN) begin
+        o_RS1 <= rs1;
+        o_RS2 <= rs2;
+        
+        case (1'b1)
+        isLoad   : o_IMM <= IMM_R;
+        isStore  : o_IMM <= IMM_S;
+        isJal    : o_IMM <= 32'd4;
+        isJalr   : o_IMM <= 32'd4;
+        isLui    : o_IMM <= IMM_U;
+        isAuipc  : o_IMM <= IMM_U;
+        isEcall  : o_IMM <= CSR;
+        default  : o_IMM <= IMM_R; 
+        endcase
+
+        o_RD_PTR <= rd_ptr;
+
+        o_PC_OLD <= pc;
     end
 end
 
-always @(posedge clk_i) begin : Op2Selector
-    if (~stall_i) begin
-    rs2_o <= rs2;
-    end
-end
-
-always @(posedge clk_i) begin
-    if (~stall_i) begin
-    rd_ptr_o <= rd_ptr;
-    end
-end
-
-initial begin
-    reg_we_o  <= 1'b0;
-    mem_we_o  <= 1'b0;
-    mem_re_o  <= 1'b0;
-    hb_o      <= 2'b00;
-    ul_o      <= 1'b0;
-    alu_src_o <= 1'b0;
-
-    rs1_o <= 32'd0;
-    rs2_o <= 32'd0;
-    rd_ptr_o <= 5'd0;
-
-    program_pointer_o <= 32'd0;
-end
+assign o_MODE = mode;
 
 endmodule

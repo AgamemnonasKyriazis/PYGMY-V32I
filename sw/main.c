@@ -3,34 +3,34 @@
 #define UROM  0x00000000
 #define SRAM  0x01000000
 #define UART  0x02000000
-#define ERAM  0x03000000
 
 volatile uint8_t* const uart = (volatile uint8_t*)(UART);
 
-volatile uint8_t* const eram = (volatile uint8_t*)(ERAM);
+const uint8_t const msg[] = "Hello World\r\n";
 
-uint8_t const msg[] = "Hello World!\r\n";
+void delay(int d);
 
 int main()
 {
+
   int i;
 
-  for (i = 0; i < 10; ++i)
+  i = 0;
+
+  while (msg[i])
   {
-    eram[i] = (uint8_t)('a'+i);
-    *uart = (uint8_t)eram[i];
+    *uart = msg[i];
+    i++;
   }
 
-  while (1)
-  {
-    i = 0;
-    while (msg[i])
-    {
-      *uart = (uint8_t)msg[i++];
-    }
-
-    for (i = 0; i < 120000; ++i);
-  }
+  while (1);
 
   return 0;
+}
+
+void delay(int d)
+{
+  while (d > 0)
+    d--;
+  return;
 }

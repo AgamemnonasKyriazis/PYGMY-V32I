@@ -4,18 +4,18 @@ ENTRY(_start)
 
 MEMORY
 {
-  ROM (rx) : ORIGIN = 0x00000000, LENGTH = 4k
-  RAM (rw) : ORIGIN = 0x01000000, LENGTH = 4k
+  ROM (rx) : ORIGIN = 0x00000000, LENGTH = 1k
+  RAM (rw) : ORIGIN = 0x01000000, LENGTH = 1k
 }
 
-ROM_START_ADDRESS   = 0x00000000;       /* Must be the same value MEMORY region rom ORIGIN above. */
-ROM_SIZE            = 4k;               /* Must be the same value MEMORY region rom LENGTH above. */
+ROM_START_ADDRESS   = 0x00000000;        /* Must be the same value MEMORY region rom ORIGIN above. */
+ROM_SIZE            = 1k;                /* Must be the same value MEMORY region rom LENGTH above. */
 
-RAM_START_ADDRESS   = 0x01000000;       /* Must be the same value MEMORY region ram ORIGIN above. */
-RAM_SIZE            = 4k;               /* Must be the same value MEMORY region ram LENGTH above. */
+RAM_START_ADDRESS   = 0x01000000;        /* Must be the same value MEMORY region ram ORIGIN above. */
+RAM_SIZE            = 1k;                /* Must be the same value MEMORY region ram LENGTH above. */
 
-STACK_SIZE          = 1k;               /* needs to be calculated for your application */     
-HEAP_SIZE           = 0k;               /* needs to be calculated for your application */
+STACK_SIZE          = 512;               /* needs to be calculated for your application */     
+HEAP_SIZE           = 512;               /* needs to be calculated for your application */
 
 SECTIONS
 {
@@ -38,7 +38,7 @@ SECTIONS
   .bss : ALIGN(0x10)
   { 
     *(.bss*)
-    PROVIDE(__stack_top = . + LENGTH(RAM));
+    PROVIDE(__stack_top$ = . + LENGTH(RAM));
   } > RAM
 
 }

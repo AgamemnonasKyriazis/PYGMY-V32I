@@ -1,0 +1,65 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sun Jul 21 11:39:34 2024
+[*]
+[dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
+[dumpfile_mtime] "Sun Jul 21 11:38:19 2024"
+[dumpfile_size] 37485113
+[savefile] "/home/agamemnon/Desktop/PYGMY/test/csr.gtkw"
+[timestart] 0
+[size] 1850 1016
+[pos] -138 -137
+*-31.000000 575620000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top_tb.
+[treeopen] top_tb.sys0.
+[treeopen] top_tb.sys0.core0.
+[treeopen] top_tb.sys0.core0.decodeUnit.
+[treeopen] top_tb.sys0.core0.executeUnit.
+[sst_width] 256
+[signals_width] 299
+[sst_expanded] 1
+[sst_vpaned_height] 294
+@28
+top_tb.sys0.core0.decodeUnit.i_RSTn
+top_tb.sys0.core0.decodeUnit.i_CLK
+top_tb.sys0.core0.decodeUnit.i_EN
+top_tb.sys0.core0.decodeUnit.isEcall
+top_tb.sys0.core0.decodeUnit.isMret
+top_tb.sys0.core0.decodeUnit.isLui
+top_tb.sys0.core0.decodeUnit.isLoad
+top_tb.sys0.core0.decodeUnit.isStore
+top_tb.sys0.core0.decodeUnit.opcode[6:0]
+@22
+top_tb.sys0.core0.decodeUnit.i_INSTRUCTION[31:0]
+top_tb.sys0.core0.decodeUnit.IMM_R[31:0]
+top_tb.sys0.core0.decodeUnit.pc[31:0]
+@200
+-
+@22
+top_tb.sys0.core0.executeUnit.i_RS1[31:0]
+top_tb.sys0.core0.executeUnit.i_RS2[31:0]
+@200
+-
+@22
+top_tb.sys0.core0.c0.i_CSR_OP1[31:0]
+top_tb.sys0.core0.c0.i_CSR_OP2[31:0]
+top_tb.sys0.core0.executeUnit.o_RD[31:0]
+@200
+-
+@28
+top_tb.sys0.core0.c0.o_IRQ
+top_tb.sys0.core0.c0.irq
+top_tb.sys0.core0.decodeUnit.mode
+@200
+-
+@22
+top_tb.sys0.core0.c0.mie_0x304[31:0]
+top_tb.sys0.core0.c0.mtvec_0x305[31:0]
+top_tb.sys0.core0.decodeUnit.pc[31:0]
+top_tb.sys0.core0.c0.mepc_0x341[31:0]
+@201
+-
+@28
+top_tb.sys0.uart0.rx_fifo_empty
+[pattern_trace] 1
+[pattern_trace] 0

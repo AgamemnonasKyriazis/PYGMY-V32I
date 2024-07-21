@@ -33,10 +33,10 @@ assign r_ptr_next = (~empty_o & re_i)? r_ptr_incr : r_ptr;
 assign full_o = r_ptr == {~w_ptr[ADDR_BITS], w_ptr[ADDR_BITS-1:0]};
 assign empty_o = r_ptr == w_ptr;
 
-assign rdata_o = (empty_o)? {WIDTH{1'b0}} : mem[r_addr];
-
 assign w_addr = w_ptr[ADDR_BITS-1:0];
 assign r_addr = r_ptr[ADDR_BITS-1:0];
+
+assign rdata_o = (empty_o)? {WIDTH{1'b0}} : mem[r_addr];
 
 always @(posedge clk_i, negedge rst_ni) begin
     if (~rst_ni) begin

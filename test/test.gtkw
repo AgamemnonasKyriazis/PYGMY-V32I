@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Mon Jun 24 20:35:27 2024
+[*]
+[dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
+[dumpfile_mtime] "Mon Jun 24 19:51:47 2024"
+[dumpfile_size] 195542163
+[savefile] "/home/agamemnon/Desktop/PYGMY/test/test.gtkw"
+[timestart] 0
+[size] 1850 1016
+[pos] -88 -88
+*-19.000000 1106400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top_tb.
+[treeopen] top_tb.sys0.
+[treeopen] top_tb.sys0.core0.
+[treeopen] top_tb.sys0.core0.decodeUnit.
+[treeopen] top_tb.sys0.ram0.
+[treeopen] top_tb.u0.
+[treeopen] top_tb.u0.d0.
+[treeopen] top_tb.u0.e0.
+[treeopen] top_tb.u0.uart0.
+[sst_width] 325
+[signals_width] 339
+[sst_expanded] 1
+[sst_vpaned_height] 609
+@28
+top_tb.u0.d0.i_CLK
+top_tb.u0.d0.i_RSTn
+@200
+-
+-SYS
+-
+@29
+top_tb.sys0.BUS_REQ
+[pattern_trace] 1
+[pattern_trace] 0

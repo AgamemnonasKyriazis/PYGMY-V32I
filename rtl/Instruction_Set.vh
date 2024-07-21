@@ -4,5 +4,7 @@ localparam [6:0] LOAD       =   7'b0000011;
 localparam [6:0] STORE      =   7'b0100011;
 localparam [6:0] BRANCH     =   7'b1100011;
 localparam [6:0] JAL        =   7'b1101111;
+localparam [6:0] JALR       =   7'b1100111;
 localparam [6:0] LUI        =   7'b0110111;
 localparam [6:0] AUIPC      =   7'b0010111;
+localparam [6:0] ECALL      =   7'b1110011;

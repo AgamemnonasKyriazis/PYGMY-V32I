@@ -14,7 +14,7 @@ module rom (
 
 wire [31:0] addr_1, addr_2;
 
-reg [31:0] rom [0:1024-1];
+reg [31:0] rom [0:1023];
 
 initial begin
     $readmemh("../sw/image.hex", rom);
