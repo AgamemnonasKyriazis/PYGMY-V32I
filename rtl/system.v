@@ -1,7 +1,7 @@
 module system(
-    input wire i_CLK,
-    input wire i_RST,
-    input wire i_UART_TXD,
+    input  wire i_CLK,
+    input  wire i_RST,
+    input  wire i_UART_TXD,
     output wire o_UART_RXD
 );
 
@@ -11,31 +11,12 @@ wire RSTn = ~i_RST;
 wire [31:0] BUS_WDATA;
 wire [31:0] BUS_ADDR;
 reg  [31:0] BUS_RDATA;
-wire BUS_WE;
-wire BUS_RE;
-wire [1:0] BUS_HB;
-wire BUS_GNT;
-wire BUS_REQ;
-wire [7:0] BUS_CE;
-
-wire MEI_0;
-
-initial begin
-    /*
-    MEI_0 = 1'b0;
-    
-    
-    #3000
-    MEI_0 = 1'b1;
-    #60
-    MEI_0 = 1'b0;
-
-    #10000
-    MEI_0 = 1'b1;
-    #60
-    MEI_0 = 1'b0;
-    */
-end
+wire        BUS_WE;
+wire        BUS_RE;
+wire [1:0]  BUS_HB;
+wire        BUS_GNT;
+wire        BUS_REQ;
+wire [7:0]  BUS_CE;
 
 core core0 (
     .i_CLK(CLK),
@@ -52,7 +33,7 @@ core core0 (
     .o_BUS_REQ(BUS_REQ),
     .o_BUS_CE(BUS_CE),
 
-    .i_MEI_0(MEI_0),
+    .i_MEI_0(UART_IRQ[0]),
     .i_MEI_1(1'b0),
     .i_MEI_2(1'b0),
     .i_MEI_3(1'b0),
@@ -169,7 +150,5 @@ always @(*) begin
     default : BUS_RDATA <= 32'd0;
     endcase
 end
-
-assign MEI_0 = UART_IRQ[0];
 
 endmodule

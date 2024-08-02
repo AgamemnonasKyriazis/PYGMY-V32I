@@ -5,7 +5,6 @@ module decode(
     input  wire  [31:0]  i_MEPC,
     input  wire          i_IRQ,
     input  wire  [31:0]  i_HANDLER_BASE,
-    output wire          o_MODE,
 
     /*-----------------------------------*/
     input wire          i_CLK,
@@ -329,7 +328,5 @@ always @(posedge i_CLK) begin : OutRegs
         o_PC_OLD <= pc;
     end
 end
-
-assign o_MODE = mode;
 
 endmodule

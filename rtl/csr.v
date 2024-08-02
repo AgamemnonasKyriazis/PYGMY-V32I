@@ -24,16 +24,15 @@ module csr (
 
 reg writeEn;
 
-reg [31:0] mie_0x304;       // enable vector
-reg [31:0] mtvec_0x305;     // trap base address
+reg [31:0] mie_0x304;                   // enable vector
+reg [31:0] mtvec_0x305;                 // trap base address
 
-reg [31:0] mscratch_0x340;  // scratch memory
-reg [31:0] mepc_0x341;      // pc that caused exception
-reg [31:0] mcause_0x342;    // cause of trap
-reg [31:0] mtval_0x343;     // instruction that caused exception
+reg [31:0] mscratch_0x340;              // scratch memory
+reg [31:0] mepc_0x341;                  // pc that caused exception
+reg [31:0] mcause_0x342;                // cause of trap
+reg [31:0] mtval_0x343;                 // instruction that caused exception
 
-reg [31:0] mcycle_0xB00;    // cycles low 32-bit
-reg [31:0] mcycleh_0xB80;   // cycles high 32-bit
+reg [31:0] mcycleh_0xB80, mcycle_0xB00; // {cycles high 32-bit, cycles low 32-bit}
 
 initial begin
     mie_0x304       = 32'd1;

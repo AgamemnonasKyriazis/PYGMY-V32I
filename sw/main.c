@@ -21,6 +21,7 @@ int main()
   {
     *uart = msg[i];
     i++;
+    delay(1000);
   }
 
   while (1);

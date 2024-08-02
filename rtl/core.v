@@ -58,8 +58,6 @@ decode decodeUnit (
     .i_MEPC(csr_mepc),
     .i_IRQ(csr_irq),
     .i_HANDLER_BASE(csr_handle_base),
-    .o_MODE(mode),
-
 
     .i_CLK(clk),
     .i_RSTn(rstn),
@@ -144,22 +142,17 @@ lsu LSU (
 
 assign o_BUS_RE = ~o_BUS_WE;
 
-wire stall = ( (|o_BUS_CE[2:0]) & (o_BUS_REQ) & (~i_BUS_GNT) ) | (csr_irq & ~mode);
+wire stall = ( (|o_BUS_CE[2:0]) & (o_BUS_REQ) & (~i_BUS_GNT) );
 
 assign o_PC = decode_execute_program_pointer;
 
 /*-----------------------------------------------------------------------------------------*/
 
 /*---------------------------- CONTROL-STATUS REGISTERS -----------------------------------*/
-wire mode;
-reg  [63:0] cycles = 0;
 wire [31:0] csr_rdata;
 wire        csr_irq;
 wire [31:0] csr_handle_base;
 wire [31:0] csr_mepc;
-
-
-always @(posedge i_CLK) cycles <= cycles + 1'b1;
 
 csr c0 (
     .i_CLK(i_CLK),
@@ -184,6 +177,12 @@ csr c0 (
     .o_IRQ_EPC(csr_mepc)
 );
 
+reg  [63:0] cycles;
+always @(posedge i_CLK, negedge i_RSTn) 
+    if (~i_RSTn)
+        cycles <= 64'd0;
+    else
+        cycles <= cycles + 1'b1;
 /*-----------------------------------------------------------------------------------------*/
 
 endmodule
