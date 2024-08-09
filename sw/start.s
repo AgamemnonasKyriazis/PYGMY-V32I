@@ -12,6 +12,10 @@ _start:
     la t0, _MSYSIE
     csrrw t0, mtvec, t0
 
+    # Load trap enable mask
+    li t0, 0x21
+    csrrw zero, mie, t0
+
     call main
 
 _halt:
@@ -51,7 +55,8 @@ _MSYSIE:
     # Begin of actual trap excecution
     csrrw t3, mie, zero
     li s0, 0x02000000
-    lw s1, 0(s0)
+    li s1, 0x61
+    lw s2, 0(s0)
     sw s1, 0(s0)
     csrrw zero, mie, t3
     # End of actual trap excecution

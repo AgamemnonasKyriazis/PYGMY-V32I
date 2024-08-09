@@ -17,13 +17,13 @@ initial begin
     rst <= 1;
     clk <= 0;
     uart_tx_buf <= {data, 1'b0, 1'b1};
-    #25
+    #85
     rst <= 0;
-    #10000000
+    #20000000
     $finish;
 end
 
-always #20 clk = ~clk;
+always #80 clk = ~clk;
 
 reg [31:0] tx_tick_count;
 reg tx_clk;
@@ -42,7 +42,7 @@ end
 always @(posedge clk)
 if (tx_clk)
     if (uart_tx_buf == 10'h3ff)
-        uart_tx_buf <= {data, 1'b0, 1'b1};
+        uart_tx_buf <= 10'h3ff;//{data, 1'b0, 1'b1};
     else
         uart_tx_buf <= {1'b1, uart_tx_buf[9:1]};
 

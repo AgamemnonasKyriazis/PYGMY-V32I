@@ -35,7 +35,8 @@ module decode(
     output wire         o_CSR,
 
     output wire [31:0]  o_PC,
-    output reg  [31:0]  o_PC_OLD
+    output reg  [31:0]  o_PC_PIPELINE,
+    output reg  [31:0]  o_INSTRUCTION
     /*-----------------------------------*/
 );
 
@@ -280,38 +281,36 @@ end
 
 always @(posedge i_CLK) begin : FunctALU
     if (~i_RSTn) begin
-        o_FUNC3I <= 8'b00000001;
-        o_FUNCT7 <= 7'd0;
-        o_ALU_OP1_SEL <= 4'd0;
-        o_ALU_OP2_SEL <= 4'd0;
+        o_FUNC3I            <= 8'b00000001;
+        o_FUNCT7            <= 7'b0000000;
+        o_ALU_OP1_SEL       <= 4'b0000;
+        o_ALU_OP2_SEL       <= 4'b0000;
     end
     else if (i_EN) begin
-        o_FUNC3I <= (isAluReg | isAluImm)? funct3I : 8'b00000001;
-        o_FUNCT7 <= (isAluReg)? funct7 : 7'd0;
-        o_ALU_OP1_SEL <= {1'b0, isLui, isJal|isJalr|isAuipc, ~(isLui|isJal|isJalr|isAuipc)};
-        o_ALU_OP2_SEL <= {1'b0, 1'b0, isAluImm|isLoad|isStore|isJal|isJalr|isLui|isAuipc, isAluReg};
+        o_FUNC3I        <= (isAluReg | isAluImm)? funct3I : 8'b00000001;
+        o_FUNCT7        <= (isAluReg)? funct7 : 7'b0000000;
+        o_ALU_OP1_SEL   <= {1'b0, isLui, isJal|isJalr|isAuipc, ~(isLui|isJal|isJalr|isAuipc)};
+        o_ALU_OP2_SEL   <= {1'b0, 1'b0, isAluImm|isLoad|isStore|isJal|isJalr|isLui|isAuipc, isAluReg};
     end
 end
 
 always @(posedge i_CLK) begin : OutRegs
     if (~i_RSTn) begin
-        o_RS1       <= 32'd0;
-        o_RS2       <= 32'd0;
-        o_IMM       <= 32'd0;
-        o_RD_PTR    <= 5'd0;
-        o_PC_OLD    <= 32'd0;
-    end
-    else if (i_IRQ && (mode == USER)) begin
-        o_RS1       <= 32'd0;
-        o_RS2       <= 32'd0;
-        o_IMM       <= 32'd0;
-        o_RD_PTR    <= 5'd0;
-        o_PC_OLD    <= pc;
+        o_RS1           <= 32'd0;
+        o_RS2           <= 32'd0;
+        o_IMM           <= 32'd0;
+        o_RD_PTR        <= 5'd0;
+        o_PC_PIPELINE   <= 32'd0;
+        o_INSTRUCTION   <= 32'd0;
     end
     else if (i_EN) begin
+        o_PC_PIPELINE   <= pc;
+        o_INSTRUCTION   <= i_INSTRUCTION;
+        
         o_RS1 <= rs1;
         o_RS2 <= rs2;
-        
+        o_RD_PTR <= rd_ptr;
+
         case (1'b1)
         isLoad   : o_IMM <= IMM_R;
         isStore  : o_IMM <= IMM_S;
@@ -322,10 +321,6 @@ always @(posedge i_CLK) begin : OutRegs
         isEcall  : o_IMM <= CSR;
         default  : o_IMM <= IMM_R; 
         endcase
-
-        o_RD_PTR <= rd_ptr;
-
-        o_PC_OLD <= pc;
     end
 end
 

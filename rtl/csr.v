@@ -2,6 +2,7 @@ module csr (
     input wire i_CLK,
     input wire i_RSTn,
     
+    input wire [1:0]  i_CSR_CMD,
     input wire [31:0] i_CSR_OP1,
     input wire [31:0] i_CSR_OP2,
 
@@ -22,8 +23,6 @@ module csr (
     output wire [31:0] o_IRQ_EPC
 );
 
-reg writeEn;
-
 reg [31:0] mie_0x304;                   // enable vector
 reg [31:0] mtvec_0x305;                 // trap base address
 
@@ -35,7 +34,7 @@ reg [31:0] mtval_0x343;                 // instruction that caused exception
 reg [31:0] mcycleh_0xB80, mcycle_0xB00; // {cycles high 32-bit, cycles low 32-bit}
 
 initial begin
-    mie_0x304       = 32'd1;
+    mie_0x304       = 32'd0;
     mtvec_0x305     = 32'd0;
     mscratch_0x340  = 32'd0;
     mepc_0x341      = 32'd0;
@@ -43,15 +42,13 @@ initial begin
     mtval_0x343     = 32'd0;
     mcycle_0xB00    = 32'd0;
     mcycleh_0xB80   = 32'd0;
-
-    writeEn         = 1'b1;
 end
 
 integer i;
 
 always @(posedge i_CLK) begin
     case (1'b1)
-    writeEn : begin
+    i_CSR_CMD[0]    : begin
         case (i_CSR_OP1)
         32'h304 : mie_0x304         <=  i_CSR_OP2;
         32'h305 : mtvec_0x305       <=  i_CSR_OP2;
@@ -59,7 +56,7 @@ always @(posedge i_CLK) begin
         default : ;
         endcase
     end
-    default : begin
+    default         : begin
 
     end
     endcase

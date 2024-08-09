@@ -1,8 +1,6 @@
 `timescale 1ns / 1ps
 
 module execute (
-    input  wire [31:0]  i_CSR_RD,
-    input  wire         i_CSR,
     /*-----------------------------------*/
     input  wire         i_CLK,
     input  wire         i_RSTn,
@@ -29,7 +27,10 @@ module execute (
     output wire         o_REG_WE,
     
     output wire [31:0]  o_MEM_ADDR,
-    input  wire [31:0]  i_MEM_RDATA
+    input  wire [31:0]  i_MEM_RDATA,
+
+    input  wire [31:0]  i_CSR_RD,
+    input  wire         i_CSR
     /*-----------------------------------*/
 );
 
