@@ -21,6 +21,9 @@ module core (
     input   wire        i_MEI_5
 );
 
+localparam USER     = 1'b0;
+localparam MACHINE  = 1'b1;
+
 wire clk = i_CLK;
 wire rstn = i_RSTn;
 
@@ -42,6 +45,7 @@ wire [1:0]  decode_execute_mem_hb;
 wire        decode_execute_mem_unsigned;
 wire [31:0] decode_execute_instruction;
 wire        decode_execute_csr;
+wire        decode_core_mode;
 
 /* EXECUTE - DECODE STAGE */
 wire [31:0] execute_decode_rd;
@@ -82,7 +86,8 @@ decode decodeUnit (
     .o_CSR(decode_execute_csr),
     .o_PC(decode_program_pointer),
     .o_PC_PIPELINE(decode_execute_program_pointer),
-    .o_INSTRUCTION(decode_execute_instruction)
+    .o_INSTRUCTION(decode_execute_instruction),
+    .o_MODE(decode_core_mode)
 );
 
 /*-----------------------------------------------------------------------------------------*/
@@ -120,7 +125,7 @@ execute executeUnit (
 
 /*-------------------------------- LOAD-STORE UNIT ----------------------------------------*/
 
-lsu LSU (
+lsu loadStoreUnit (
     /* CORE */
     .i_WDATA(decode_execute_rs2),
     .i_ADDR(execute_lsu_addr),
@@ -156,11 +161,14 @@ wire [31:0] csr_mepc;
 
 reg  [63:0] cycles;
 
-csr c0 (
+csr controlStatusRegs (
     .i_CLK(i_CLK),
     .i_RSTn(i_RSTn),
     
-    .i_CSR_CMD({1'b0, decode_execute_csr}),
+    .i_CSR_EN( (decode_core_mode == USER) ),
+    
+    .i_CSR_FUNCT_EN(decode_execute_csr),
+    .i_CSR_FUNCT(decode_execute_funct3I),
     .i_CSR_OP1(decode_execute_imm),
     .i_CSR_OP2(decode_execute_rs1),
     .i_PC(decode_execute_program_pointer),

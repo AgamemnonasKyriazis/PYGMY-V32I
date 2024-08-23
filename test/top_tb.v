@@ -19,7 +19,7 @@ initial begin
     uart_tx_buf <= {data, 1'b0, 1'b1};
     #85
     rst <= 0;
-    #20000000
+    #50000000
     $finish;
 end
 
@@ -42,7 +42,7 @@ end
 always @(posedge clk)
 if (tx_clk)
     if (uart_tx_buf == 10'h3ff)
-        uart_tx_buf <= 10'h3ff;//{data, 1'b0, 1'b1};
+        uart_tx_buf <= uart_tx_buf;//{data, 1'b0, 1'b1};
     else
         uart_tx_buf <= {1'b1, uart_tx_buf[9:1]};
 

@@ -21,6 +21,7 @@ _start:
 _halt:
     j _halt
 
+
 _MSYSIE:
     # Save the context
     addi sp, sp, -128       # Allocate stack space
@@ -53,12 +54,7 @@ _MSYSIE:
     sw s10, 20(sp)
     sw s11, 16(sp)
     # Begin of actual trap excecution
-    csrrw t3, mie, zero
-    li s0, 0x02000000
-    li s1, 0x61
-    lw s2, 0(s0)
-    sw s1, 0(s0)
-    csrrw zero, mie, t3
+    call BASE_IRQ_HANDLER
     # End of actual trap excecution
     # Restore the context
     lw ra, 124(sp)          # Restore return address
@@ -90,5 +86,4 @@ _MSYSIE:
     lw s10, 20(sp)
     lw s11, 16(sp)
     addi sp, sp, 128        # Deallocate stack space
-    
     mret

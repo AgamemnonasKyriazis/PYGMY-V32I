@@ -27,7 +27,7 @@ localparam [2:0] IDLE = 3'b001;
 localparam [2:0] BUSY = 3'b010;
 localparam [2:0] RSTS = 3'b100;
 
-localparam SIZE = 1 * 1024;
+localparam SIZE = 2*1024;
 
 wire wordEn =  hb_i[1] & ~hb_i[0];
 wire halfEn = ~hb_i[1] &  hb_i[0];
@@ -112,6 +112,12 @@ always @(*) begin
         rdata_o <= outBuf;
     end
     endcase
+end
+
+integer i;
+initial begin
+    for (i = 0; i < SIZE; i=i+1)
+        sram[i] <= 32'hcacacaca;
 end
 
 endmodule

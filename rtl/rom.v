@@ -14,32 +14,37 @@ module rom (
 
 wire [31:0] addr_1, addr_2;
 
-reg [31:0] rom [0:1023];
+localparam SIZE = 2*1024;
+
+reg [31:0] rom [0:SIZE-1];
 
 initial begin
     $readmemh("../sw/image.hex", rom);
 end
 
 always @(*) begin
+    if (urom_ce_i)
     case (hb_i)
     2'b00 : begin
         case (addr_prt1_i[1:0])
-        2'b00 : rdata_prt1_o = {24'b0, rom[addr_1][7:0]};
-        2'b01 : rdata_prt1_o = {24'b0, rom[addr_1][15:8]};
-        2'b10 : rdata_prt1_o = {24'b0, rom[addr_1][23:16]};
-        2'b11 : rdata_prt1_o = {24'b0, rom[addr_1][31:24]};
+        2'b00   : rdata_prt1_o <= {24'b0, rom[addr_1][7:0]};
+        2'b01   : rdata_prt1_o <= {24'b0, rom[addr_1][15:8]};
+        2'b10   : rdata_prt1_o <= {24'b0, rom[addr_1][23:16]};
+        2'b11   : rdata_prt1_o <= {24'b0, rom[addr_1][31:24]};
         endcase
     end
     2'b01 : begin
         case (addr_prt1_i[1:0])
-        2'b10 : rdata_prt1_o = {16'b0, rom[addr_1][31:16]};
-        default : rdata_prt1_o = {16'b0, rom[addr_1][15:0]};
+        2'b10   : rdata_prt1_o <= {16'b0, rom[addr_1][31:16]};
+        default : rdata_prt1_o <= {16'b0, rom[addr_1][15:0]};
         endcase
     end
     default : begin
-        rdata_prt1_o = rom[addr_1];
+        rdata_prt1_o <= rom[addr_1];
     end
     endcase
+    else
+        rdata_prt1_o <= 32'd0;
 end
 
 always @(*) begin

@@ -142,32 +142,25 @@ assign UART_REQ     = BUS_REQ;
 /* EXT TIMER */
 wire        TIMER_CE;
 wire        TIMER_WE;
-wire        TIMER_RE;
-wire [31:0] TIMER_ADDR;
 wire [31:0] TIMER_WDATA;
-wire [31:0] TIMER_RDATA;
 wire        TIMER_REQ;
 wire        TIMER_GNT;
 wire        TIMER_IRQ;
+
 timer timer_ext
 (
     .i_CLK(CLK),
     .i_RSTn(RSTn),
     .i_CE(TIMER_CE),
     .i_WE(TIMER_WE),
-    .i_RE(TIMER_RE),
-    .i_ADDR(TIMER_ADDR),
     .i_WDATA(TIMER_WDATA),
     .i_REQ(TIMER_REQ),
-    .o_RDATA(TIMER_RDATA),
     .o_GNT(TIMER_GNT),
     .o_IRQ(TIMER_IRQ)
 );
 
 assign TIMER_CE     = BUS_CE[3];
 assign TIMER_WE     = BUS_WE;
-assign TIMER_RE     = BUS_RE;
-assign TIMER_ADDR   = BUS_ADDR;
 assign TIMER_WDATA  = BUS_WDATA;
 assign TIMER_REQ    = BUS_REQ;
 
@@ -179,7 +172,6 @@ always @(*) begin
     UROM_CE     : BUS_RDATA <= UROM_RDATA_DATA;
     SRAM_CE     : BUS_RDATA <= SRAM_RDATA;
     UART_CE     : BUS_RDATA <= UART_RDATA;
-    TIMER_CE    : BUS_RDATA <= TIMER_RDATA;
     default     : BUS_RDATA <= 32'd0;
     endcase
 end

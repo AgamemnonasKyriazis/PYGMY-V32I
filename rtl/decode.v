@@ -36,7 +36,9 @@ module decode(
 
     output wire [31:0]  o_PC,
     output reg  [31:0]  o_PC_PIPELINE,
-    output reg  [31:0]  o_INSTRUCTION
+    output reg  [31:0]  o_INSTRUCTION,
+
+    output wire         o_MODE
     /*-----------------------------------*/
 );
 
@@ -118,6 +120,8 @@ localparam USER     = 1'b0;
 localparam MACHINE  = 1'b1;
 reg mode;
 
+assign o_MODE = mode;
+
 always @(posedge i_CLK) begin : Mode
     if (~i_RSTn)
         mode <= USER;
@@ -169,14 +173,14 @@ always @(posedge i_CLK) begin : SignalControl
         uload   <= 1'b0;
         csr     <= 1'b0;
     end
-    else if (i_IRQ && (mode == USER)) begin
-        reg_we  <= 1'b0;
-        mem_we  <= 1'b0;
-        mem_re  <= 1'b0;
-        hb      <= 2'b00;
-        uload   <= 1'b0;
-        csr     <= 1'b0;
-    end
+//    else if (i_IRQ && (mode == USER)) begin
+//        reg_we  <= 1'b0;
+//        mem_we  <= 1'b0;
+//        mem_re  <= 1'b0;
+//        hb      <= 2'b00;
+//        uload   <= 1'b0;
+//        csr     <= 1'b0;
+//    end
     else if (i_EN) begin
     case (1'b1)
     isAluReg   : begin
@@ -287,7 +291,7 @@ always @(posedge i_CLK) begin : FunctALU
         o_ALU_OP2_SEL       <= 4'b0000;
     end
     else if (i_EN) begin
-        o_FUNC3I        <= (isAluReg | isAluImm)? funct3I : 8'b00000001;
+        o_FUNC3I        <= (isAluReg | isAluImm | isEcall)? funct3I : 8'b00000001;
         o_FUNCT7        <= (isAluReg)? funct7 : 7'b0000000;
         o_ALU_OP1_SEL   <= {1'b0, isLui, isJal|isJalr|isAuipc, ~(isLui|isJal|isJalr|isAuipc)};
         o_ALU_OP2_SEL   <= {1'b0, 1'b0, isAluImm|isLoad|isStore|isJal|isJalr|isLui|isAuipc, isAluReg};
