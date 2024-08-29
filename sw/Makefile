@@ -6,7 +6,7 @@ OBJCOPY = riscv32-unknown-elf-objcopy
 TARGET = main
 
 # Define the source and object files
-SRCS = start.s main.c
+SRCS = start.s hal.c main.c
 OBJS = $(SRCS:.c=.o)
 OBJS := $(OBJS:.s=.o)
 
@@ -14,7 +14,6 @@ OBJS := $(OBJS:.s=.o)
 all: $(TARGET).bin
 	@hexdump -v -e '"@%04_ax " 1/1 "%02x\n"' main.bin > readmemfmt.hex
 	@python3 main.py > image.hex
-	@rm readmemfmt.hex
 	@echo "DONE"
 
 # Rule to build the .bin file
@@ -39,4 +38,4 @@ start.o: start.s
 
 # Clean up generated files
 clean:
-	rm -f $(OBJS) $(TARGET).elf $(TARGET).hex $(TARGET).bin image.hex
+	rm -f $(OBJS) $(TARGET).elf $(TARGET).hex $(TARGET).bin image.hex readmemfmt.hex

@@ -45,7 +45,8 @@ module decode(
 `include "Core.vh"
 `include "Instruction_Set.vh"
 
-wire [6:0] opcode   = i_INSTRUCTION[6:0];
+wire [31:0] instruction = (enter_trap)? NOOP : i_INSTRUCTION;
+wire [6:0]  opcode      = instruction[6:0];
 
 wire isAluReg       = (opcode == ALU_R);
 wire isAluImm       = (opcode == ALU_I);
@@ -58,17 +59,18 @@ wire isAuipc        = (opcode == AUIPC);
 wire isEcall        = (opcode == ECALL);
 wire isJalr         = (opcode == JALR);
 wire isMret         = isEcall & (IMM_R == 32'h302);
+wire isNoop         = (instruction == NOOP);
 
-wire [2:0] funct3   = i_INSTRUCTION[14:12];
-wire [6:0] funct7   = i_INSTRUCTION[31:25];
+wire [2:0] funct3   = instruction[14:12];
+wire [6:0] funct7   = instruction[31:25];
 wire [7:0] funct3I  = 8'b00000001 << funct3;
 
 wire signed [31:0] rs1;
 wire signed [31:0] rs2;
 
-wire [4:0] rd_ptr   = i_INSTRUCTION[11:7];
-wire [4:0] rs1_ptr  = i_INSTRUCTION[19:15];
-wire [4:0] rs2_ptr  = i_INSTRUCTION[24:20];
+wire [4:0] rd_ptr   = instruction[11:7];
+wire [4:0] rs1_ptr  = instruction[19:15];
+wire [4:0] rs2_ptr  = instruction[24:20];
 
 regfile registers (
     .clk_i(i_CLK),
@@ -103,13 +105,13 @@ wire isFollowed =
     (funct3I[6] & LTU)|
     (funct3I[7] & GTU));
 
-wire [31:0] IMM_J   = { {11{i_INSTRUCTION[31]}}, i_INSTRUCTION[31], i_INSTRUCTION[19:12], i_INSTRUCTION[20], i_INSTRUCTION[30:21], 1'b0 };
-wire [31:0] IMM_B   = { {19{i_INSTRUCTION[31]}}, i_INSTRUCTION[31], i_INSTRUCTION[7], i_INSTRUCTION[30:25], i_INSTRUCTION[11:8], 1'b0 };
-wire [31:0] IMM_U   = { i_INSTRUCTION[31:12], 12'b0 };
-wire [31:0] IMM_R   = { {20{i_INSTRUCTION[31]}}, i_INSTRUCTION[31:20] };
-wire [31:0] IMM_S   = { {20{i_INSTRUCTION[31]}}, i_INSTRUCTION[31:25], i_INSTRUCTION[11:7] };
-wire [31:0] SHAMT   = { 25'b0, i_INSTRUCTION[24:20] };
-wire [31:0] CSR     = { 20'b0, i_INSTRUCTION[31:20] };
+wire [31:0] IMM_J   = { {11{instruction[31]}}, instruction[31], instruction[19:12], instruction[20], instruction[30:21], 1'b0 };
+wire [31:0] IMM_B   = { {19{instruction[31]}}, instruction[31], instruction[7], instruction[30:25], instruction[11:8], 1'b0 };
+wire [31:0] IMM_U   = { instruction[31:12], 12'b0 };
+wire [31:0] IMM_R   = { {20{instruction[31]}}, instruction[31:20] };
+wire [31:0] IMM_S   = { {20{instruction[31]}}, instruction[31:25], instruction[11:7] };
+wire [31:0] SHAMT   = { 25'b0, instruction[24:20] };
+wire [31:0] CSR     = { 20'b0, instruction[31:20] };
 
 reg  [31:0] pc;
 wire [31:0] pc_incr = (isJal)? IMM_J : (isFollowed & isBranch)? IMM_B : 32'd4;
@@ -122,32 +124,36 @@ reg mode;
 
 assign o_MODE = mode;
 
+wire enter_trap = i_IRQ && (mode == USER);
+wire leave_trap = isEcall && (IMM_R == 32'h302) && (mode == MACHINE);
+wire stall_here = ~i_EN;
+
 always @(posedge i_CLK) begin : Mode
     if (~i_RSTn)
         mode <= USER;
-    else if (i_IRQ && (mode == USER))
+    else if (stall_here)
+        mode <= mode;
+    else if (enter_trap)
         mode <= MACHINE;
-    else if (isMret)
+    else if (leave_trap)
         mode <= USER;
     else
         mode <= mode;
 end
 
 always @(posedge i_CLK) begin : ProgramPointer
-    if (~i_RSTn) begin
-        pc   <= 32'd0;
-    end
-    else if (i_IRQ && (mode == USER))
-        pc   <= i_HANDLER_BASE;
-    else if (i_EN)
-        if (isMret)
-            pc   <= i_MEPC;
-        else if (isJalr)
-            pc   <= rs1 + IMM_R;
-        else
-            pc   <= pc + pc_incr;
+    if (~i_RSTn)
+        pc  <= 32'd0;
+    else if (stall_here)
+        pc  <= pc;
+    else if (enter_trap)
+        pc  <= i_HANDLER_BASE;
+    else if (leave_trap)
+        pc  <= i_MEPC;
+    else if (isJalr)
+        pc  <= rs1 + IMM_R;
     else
-        pc   <= pc;
+        pc  <= pc + pc_incr;
 end
 
 reg         reg_we;
@@ -172,16 +178,24 @@ always @(posedge i_CLK) begin : SignalControl
         hb      <= 2'b00;
         uload   <= 1'b0;
         csr     <= 1'b0;
+    end    
+    else if (stall_here) begin
+        reg_we  <= reg_we;
+        mem_we  <= mem_we;
+        mem_re  <= mem_re;
+        hb      <= hb;
+        uload   <= uload;
+        csr     <= csr;
     end
-//    else if (i_IRQ && (mode == USER)) begin
-//        reg_we  <= 1'b0;
-//        mem_we  <= 1'b0;
-//        mem_re  <= 1'b0;
-//        hb      <= 2'b00;
-//        uload   <= 1'b0;
-//        csr     <= 1'b0;
-//    end
-    else if (i_EN) begin
+    else if (enter_trap) begin
+        reg_we  <= 1'b0;
+        mem_we  <= 1'b0;
+        mem_re  <= 1'b0;
+        hb      <= 2'b00;
+        uload   <= 1'b0;
+        csr     <= 1'b0;
+    end
+    else begin
     case (1'b1)
     isAluReg   : begin
         reg_we  <= 1'b1;
@@ -273,14 +287,6 @@ always @(posedge i_CLK) begin : SignalControl
     end
     endcase
     end
-    else begin
-        reg_we  <= reg_we;
-        mem_we  <= mem_we;
-        mem_re  <= mem_re;
-        hb      <= hb;
-        uload   <= uload;
-        csr     <= csr;
-    end
 end
 
 always @(posedge i_CLK) begin : FunctALU
@@ -290,7 +296,19 @@ always @(posedge i_CLK) begin : FunctALU
         o_ALU_OP1_SEL       <= 4'b0000;
         o_ALU_OP2_SEL       <= 4'b0000;
     end
-    else if (i_EN) begin
+    else if (stall_here) begin
+        o_FUNC3I        <= o_FUNC3I; 
+        o_FUNCT7        <= o_FUNCT7;
+        o_ALU_OP1_SEL   <= o_ALU_OP1_SEL;
+        o_ALU_OP2_SEL   <= o_ALU_OP2_SEL;
+    end
+    else if (enter_trap) begin
+        o_FUNC3I            <= 8'b00000001;
+        o_FUNCT7            <= 7'b0000000;
+        o_ALU_OP1_SEL       <= 4'b0000;
+        o_ALU_OP2_SEL       <= 4'b0000;
+    end
+    else begin
         o_FUNC3I        <= (isAluReg | isAluImm | isEcall)? funct3I : 8'b00000001;
         o_FUNCT7        <= (isAluReg)? funct7 : 7'b0000000;
         o_ALU_OP1_SEL   <= {1'b0, isLui, isJal|isJalr|isAuipc, ~(isLui|isJal|isJalr|isAuipc)};
@@ -307,14 +325,28 @@ always @(posedge i_CLK) begin : OutRegs
         o_PC_PIPELINE   <= 32'd0;
         o_INSTRUCTION   <= 32'd0;
     end
-    else if (i_EN) begin
+    else if (stall_here) begin
+        o_PC_PIPELINE   <= o_PC_PIPELINE;
+        o_INSTRUCTION   <= o_INSTRUCTION;
+        o_RS1           <= o_RS1;
+        o_RS2           <= o_RS2;
+        o_RD_PTR        <= o_RD_PTR;
+        o_IMM           <= o_IMM;
+    end
+    else if (enter_trap) begin
+        o_PC_PIPELINE   <= o_PC_PIPELINE;
+        o_INSTRUCTION   <= o_INSTRUCTION;
+        o_RS1           <= 32'd0;
+        o_RS2           <= 32'd0;
+        o_RD_PTR        <= 5'd0;
+        o_IMM           <= 32'd0;
+    end
+    else begin
         o_PC_PIPELINE   <= pc;
-        o_INSTRUCTION   <= i_INSTRUCTION;
-        
+        o_INSTRUCTION   <= instruction;
         o_RS1 <= rs1;
         o_RS2 <= rs2;
         o_RD_PTR <= rd_ptr;
-
         case (1'b1)
         isLoad   : o_IMM <= IMM_R;
         isStore  : o_IMM <= IMM_S;

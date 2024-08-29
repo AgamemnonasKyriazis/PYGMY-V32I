@@ -12,10 +12,6 @@ _start:
     la t0, _MSYSIE
     csrrw t0, mtvec, t0
 
-    # Load trap enable mask
-    li t0, 0x21
-    csrrw zero, mie, t0
-
     call main
 
 _halt:

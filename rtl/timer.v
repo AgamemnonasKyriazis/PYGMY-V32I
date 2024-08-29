@@ -1,4 +1,6 @@
-module timer (
+module timer #(
+    parameter SYS_FREQ = 32'd12_000_000
+)(
     input  wire         i_CLK,
     input  wire         i_RSTn,
     input  wire         i_CE, 
@@ -14,7 +16,7 @@ reg [31:0]  interval;
 reg         irq;
 reg         gnt;
 
-wire trigger = (cycles == (interval-1'd1));
+wire trigger    = ( (cycles == interval) && (interval != 0) );
 
 always @(posedge i_CLK) begin
     if (~i_RSTn) begin
@@ -22,8 +24,8 @@ always @(posedge i_CLK) begin
         irq     <= 1'b0;
     end
     else begin
-        cycles  <= (trigger)? 32'd0 : cycles + 32'd1;
-        irq     <= (trigger);
+        irq     <= ( trigger );
+        cycles  <= ( (trigger) || (interval == 0) )? 32'd0 : cycles + 32'd1;
     end
 end
 
@@ -32,7 +34,7 @@ always @(posedge i_CLK) begin
         interval    <= 32'd0;
     end
     else if (i_WE & i_REQ & i_CE) begin
-        interval  <=  i_WDATA>>1;
+        interval  <=  i_WDATA;
     end
 end
 

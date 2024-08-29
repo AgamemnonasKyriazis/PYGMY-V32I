@@ -113,7 +113,7 @@ always @(posedge i_CLK) begin
         mcause_0x342[31]  <= irq;
     end
 
-    if ( ((~mcause_0x342[31])) & (irq) & (i_CSR_EN) ) begin
+    if ( ~mcause_0x342[31] & irq & i_CSR_EN ) begin
         mepc_0x341  <= i_PC;
         mtval_0x343 <= i_INSTR;
     end

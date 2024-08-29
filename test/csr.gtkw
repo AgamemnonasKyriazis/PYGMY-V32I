@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Aug 22 20:32:15 2024
+[*] Wed Aug 28 22:41:41 2024
 [*]
 [dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Thu Aug 22 20:31:43 2024"
-[dumpfile_size] 195355331
+[dumpfile_mtime] "Wed Aug 28 22:41:20 2024"
+[dumpfile_size] 55757519
 [savefile] "/home/agamemnon/Desktop/PYGMY/test/csr.gtkw"
 [timestart] 0
 [size] 1850 1016
-[pos] -101 -101
-*-25.000000 62000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -38 -38
+*-29.000000 1352000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
 [treeopen] top_tb.sys0.core0.decodeUnit.
 [treeopen] top_tb.sys0.core0.executeUnit.
-[sst_width] 256
+[sst_width] 368
 [signals_width] 299
 [sst_expanded] 1
 [sst_vpaned_height] 482
@@ -30,6 +30,7 @@ top_tb.sys0.core0.decodeUnit.isLoad
 top_tb.sys0.core0.decodeUnit.isStore
 top_tb.sys0.core0.decodeUnit.isBranch
 top_tb.sys0.core0.decodeUnit.isJal
+top_tb.sys0.core0.decodeUnit.isNoop
 top_tb.sys0.core0.decodeUnit.opcode[6:0]
 @22
 top_tb.sys0.core0.decodeUnit.i_INSTRUCTION[31:0]
@@ -38,42 +39,148 @@ top_tb.sys0.core0.decodeUnit.pc[31:0]
 @200
 -
 @28
-top_tb.sys0.core0.decodeUnit.mode
+top_tb.sys0.core0.decodeUnit.i_IRQ
+top_tb.sys0.core0.decode_core_mode
 @200
 -
 @22
-top_tb.sys0.core0.decodeUnit.pc[31:0]
+top_tb.sys0.core0.controlStatusRegs.i_PC[31:0]
+@c00022
+top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+@28
+(0)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(1)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(2)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(3)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(4)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(5)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(6)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(7)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(8)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(9)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(10)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(11)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(12)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(13)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(14)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(15)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(16)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(17)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(18)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(19)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(20)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(21)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(22)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(23)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(24)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(25)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(26)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(27)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(28)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(29)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(30)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+(31)top_tb.sys0.core0.controlStatusRegs.mepc_0x341[31:0]
+@1401200
+-group_end
 @200
 -
+@22
+top_tb.sys0.core0.loadStoreUnit.o_BUS_ADDR[31:0]
 @28
 top_tb.sys0.core0.loadStoreUnit.o_BUS_REQ
-top_tb.sys0.core0.loadStoreUnit.i_BUS_GNT
-@200
--
 @22
-top_tb.sys0.rom0.addr_1[31:0]
+top_tb.sys0.rom0.urom_ce_i
+@c00022
 top_tb.sys0.rom0.rdata_prt1_o[31:0]
-top_tb.sys0.rom0.addr_prt2_i[31:0]
-top_tb.sys0.rom0.rdata_prt2_o[31:0]
+@28
+(0)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(1)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(2)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(3)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(4)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(5)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(6)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(7)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(8)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(9)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(10)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(11)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(12)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(13)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(14)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(15)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(16)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(17)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(18)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(19)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(20)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(21)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(22)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(23)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(24)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(25)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(26)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(27)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(28)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(29)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(30)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+(31)top_tb.sys0.rom0.rdata_prt1_o[31:0]
+@1401200
+-group_end
+@28
+top_tb.sys0.rom0.hb_i[1:0]
+@c00022
+top_tb.sys0.rom0.addr_prt1_i[31:0]
+@28
+(0)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(1)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(2)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(3)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(4)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(5)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(6)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(7)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(8)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(9)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(10)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(11)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(12)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(13)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(14)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(15)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(16)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(17)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(18)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(19)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(20)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(21)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(22)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(23)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(24)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(25)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(26)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(27)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(28)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(29)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(30)top_tb.sys0.rom0.addr_prt1_i[31:0]
+(31)top_tb.sys0.rom0.addr_prt1_i[31:0]
+@1401200
+-group_end
 @200
 -
+@28
+top_tb.sys0.core0.loadStoreUnit.o_BUS_WE
+top_tb.sys0.ram0.we_i
 @22
-top_tb.sys0.core0.executeUnit.ALU.i_OP1[31:0]
-top_tb.sys0.core0.executeUnit.ALU.i_OP2[31:0]
-top_tb.sys0.core0.executeUnit.ALU.i_OPCODE[8:0]
-top_tb.sys0.core0.executeUnit.ALU.o_RES[31:0]
-@28
-top_tb.sys0.core0.decodeUnit.registers.reg_write_en_i
-@22
-top_tb.sys0.core0.decodeUnit.registers.rd_ptr_i[4:0]
-top_tb.sys0.core0.decodeUnit.registers.rd_i[31:0]
+top_tb.sys0.ram0.wdata_i[31:0]
 @200
 -
 @28
-top_tb.sys0.uart0.uart_ce_i
-@200
--
-@28
-top_tb.sys0.core0.decodeUnit.i_IRQ
+top_tb.sys0.core0.i_MEI_0
+top_tb.sys0.core0.i_MEI_1
+top_tb.sys0.core0.i_MEI_2
+top_tb.sys0.core0.i_MEI_3
+top_tb.sys0.core0.i_MEI_4
+top_tb.sys0.core0.i_MEI_5
 [pattern_trace] 1
 [pattern_trace] 0

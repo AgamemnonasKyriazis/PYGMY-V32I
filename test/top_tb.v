@@ -17,13 +17,13 @@ initial begin
     rst <= 1;
     clk <= 0;
     uart_tx_buf <= {data, 1'b0, 1'b1};
-    #85
+    #83
     rst <= 0;
     #50000000
     $finish;
 end
 
-always #80 clk = ~clk;
+always #83 clk = ~clk;
 
 reg [31:0] tx_tick_count;
 reg tx_clk;

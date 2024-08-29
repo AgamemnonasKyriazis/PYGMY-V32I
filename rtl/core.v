@@ -139,13 +139,12 @@ lsu loadStoreUnit (
     .o_BUS_WDATA(o_BUS_WDATA), 
     .o_BUS_ADDR(o_BUS_ADDR),
     .o_BUS_WE(o_BUS_WE),
+    .o_BUS_RE(o_BUS_RE),
     .o_BUS_HB(o_BUS_HB),
     .o_BUS_CE(o_BUS_CE),
     .o_BUS_REQ(o_BUS_REQ),
     .i_BUS_GNT(i_BUS_GNT)
 );
-
-assign o_BUS_RE = ~o_BUS_WE;
 
 wire stall = ( (|o_BUS_CE[3:0]) & (o_BUS_REQ) & (~i_BUS_GNT) );
 

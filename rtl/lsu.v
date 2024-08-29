@@ -14,6 +14,7 @@ module lsu (
     output  wire [31:0] o_BUS_WDATA, 
     output  wire [31:0] o_BUS_ADDR,
     output  wire        o_BUS_WE,
+    output  wire        o_BUS_RE,
     output  wire [1:0]  o_BUS_HB,
     output  reg  [7:0]  o_BUS_CE,
     output  wire        o_BUS_REQ,
@@ -25,6 +26,7 @@ module lsu (
 assign o_BUS_WDATA  = i_WDATA;
 assign o_BUS_ADDR   = {4'h0, i_ADDR[27:0]};
 assign o_BUS_WE     = i_WE;
+assign o_BUS_RE     = i_RE;
 assign o_BUS_HB     = i_HB;
 assign o_BUS_REQ    = (|o_BUS_CE) & (i_WE | i_RE);
 assign o_RDATA      = i_BUS_RDATA;

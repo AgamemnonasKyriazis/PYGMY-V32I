@@ -14,13 +14,15 @@ module rom (
 
 wire [31:0] addr_1, addr_2;
 
-localparam SIZE = 2*1024;
+localparam SIZE = 1*1024;
 
 reg [31:0] rom [0:SIZE-1];
 
 initial begin
     $readmemh("../sw/image.hex", rom);
 end
+
+wire [31:0] rdata = rom[addr_1];
 
 always @(*) begin
     if (urom_ce_i)

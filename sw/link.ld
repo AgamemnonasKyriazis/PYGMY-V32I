@@ -4,17 +4,17 @@ ENTRY(_start)
 
 MEMORY
 {
-  ROM (rx) : ORIGIN = 0x00000000, LENGTH = 2k
-  RAM (rw) : ORIGIN = 0x20000000, LENGTH = 8k
+  ROM (rx) : ORIGIN = 0x00000000, LENGTH = 4k
+  RAM (rw) : ORIGIN = 0x20000000, LENGTH = 4k
 }
 
 ROM_START_ADDRESS   = 0x00000000;        /* Must be the same value MEMORY region rom ORIGIN above. */
-ROM_SIZE            = 2k;                /* Must be the same value MEMORY region rom LENGTH above. */
+ROM_SIZE            = 4k;                /* Must be the same value MEMORY region rom LENGTH above. */
 
 RAM_START_ADDRESS   = 0x20000000;        /* Must be the same value MEMORY region ram ORIGIN above. */
-RAM_SIZE            = 8k;                /* Must be the same value MEMORY region ram LENGTH above. */
+RAM_SIZE            = 4k;                /* Must be the same value MEMORY region ram LENGTH above. */
 
-STACK_SIZE          = 8k;               /* needs to be calculated for your application */     
+STACK_SIZE          = 4k;               /* needs to be calculated for your application */     
 HEAP_SIZE           = 0;                /* needs to be calculated for your application */
 
 SECTIONS

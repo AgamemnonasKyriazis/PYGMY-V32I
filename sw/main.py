@@ -14,6 +14,10 @@ with open("readmemfmt.hex", "r") as f:
       bytelst = []
       i += 1
   
+  bytelst = bytelst + (4-len(bytelst))*['00']
+  print(''.join(bytelst[::-1]))
+  i+=1
+
   for _ in range(i, SIZE):
     print('00000000')
 print(i, file=sys.stderr)

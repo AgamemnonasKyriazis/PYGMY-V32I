@@ -8,3 +8,5 @@ localparam [6:0] JALR       =   7'b1100111;
 localparam [6:0] LUI        =   7'b0110111;
 localparam [6:0] AUIPC      =   7'b0010111;
 localparam [6:0] ECALL      =   7'b1110011;
+
+localparam [31:0] NOOP      =   32'h00000013;
