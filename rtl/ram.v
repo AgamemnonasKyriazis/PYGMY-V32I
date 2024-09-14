@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 
-module ram(
+module ram #(
+    parameter SIZE = 1024
+) (
     /* system clock */
     input wire clk_i,
     input wire rst_ni,
@@ -26,8 +28,6 @@ module ram(
 localparam [2:0] IDLE = 3'b001;
 localparam [2:0] BUSY = 3'b010;
 localparam [2:0] RSTS = 3'b100;
-
-localparam SIZE = 1*1024;
 
 wire wordEn =  hb_i[1] & ~hb_i[0];
 wire halfEn = ~hb_i[1] &  hb_i[0];
@@ -81,7 +81,7 @@ always @(posedge clk_i) begin
             1'b1 : sram[addr][31:16] <= wdata_i[15:0];
             endcase
         end
-        wordEn : begin
+        default : begin
             sram[addr] <= wdata_i;
         end
         endcase
@@ -108,16 +108,10 @@ always @(*) begin
         1'b1 : rdata_o <= { 16'b0, outBuf[31:16] };
         endcase
     end
-    wordEn : begin
+    default : begin
         rdata_o <= outBuf;
     end
     endcase
-end
-
-integer i;
-initial begin
-    for (i = 0; i < SIZE; i=i+1)
-        sram[i] <= 32'hcacacaca;
 end
 
 endmodule

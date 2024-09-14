@@ -18,7 +18,7 @@ with open("readmemfmt.hex", "r") as f:
   print(''.join(bytelst[::-1]))
   i+=1
 
-  for _ in range(i, SIZE):
-    print('00000000')
+#  for _ in range(i, SIZE):
+#    print('00000000')
 print(i, file=sys.stderr)
       

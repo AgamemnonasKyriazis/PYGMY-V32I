@@ -98,7 +98,7 @@ sync_fifo #(
     .empty_o(tx_fifo_empty)         // empty flag
 );
 
-always @(posedge clk_i, negedge rst_ni) begin: ShiftRegister
+always @(posedge clk_i) begin: ShiftRegister
     if (~rst_ni) begin
         rx_sft_reg <= 3'b111;
     end
@@ -107,7 +107,7 @@ always @(posedge clk_i, negedge rst_ni) begin: ShiftRegister
     end
 end
 
-always @(posedge clk_i, negedge rst_ni) begin: RxClk
+always @(posedge clk_i) begin: RxClk
     if (~rst_ni) begin
         rx_tick_count <= 'b0;
         rx_clk <= 'b0;
@@ -118,7 +118,7 @@ always @(posedge clk_i, negedge rst_ni) begin: RxClk
     end
 end
 
-always @(posedge clk_i, negedge rst_ni) begin: TxClk
+always @(posedge clk_i) begin: TxClk
     if (~rst_ni) begin
         tx_tick_count <= 'b0;
         tx_clk <= 'b0;
@@ -129,7 +129,7 @@ always @(posedge clk_i, negedge rst_ni) begin: TxClk
     end
 end
 
-always @(posedge clk_i, negedge rst_ni) begin: RxSyncStateMachine
+always @(posedge clk_i) begin: RxSyncStateMachine
     if (~rst_ni) begin
         rx_state <= RX_IDLE;
         rx_frame_count <= 'b0;
@@ -151,7 +151,7 @@ always @(posedge clk_i, negedge rst_ni) begin: RxSyncStateMachine
     end
 end
 
-always @(posedge clk_i, negedge rst_ni) begin: TxSyncStateMachine
+always @(posedge clk_i) begin: TxSyncStateMachine
     if (~rst_ni) begin
         tx_state <= TX_IDLE;
         tx_frame_buf <= ~'b0;

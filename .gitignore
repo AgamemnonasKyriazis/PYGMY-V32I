@@ -2,3 +2,4 @@ build/*
 .Xil/*
 .vscode/*
 /test/*.vcd
+/test/*.out

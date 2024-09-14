@@ -38,7 +38,7 @@ assign r_addr = r_ptr[ADDR_BITS-1:0];
 
 assign rdata_o = (empty_o)? {WIDTH{1'b0}} : mem[r_addr];
 
-always @(posedge clk_i, negedge rst_ni) begin
+always @(posedge clk_i) begin
     if (~rst_ni) begin
         w_ptr <= 0;
         r_ptr <= 0;

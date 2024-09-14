@@ -38,7 +38,10 @@ core core0 (
     .i_MEI_2(1'b0),
     .i_MEI_3(1'b0),
     .i_MEI_4(1'b0),
-    .i_MEI_5(TIMER_IRQ)
+    .i_MEI_5(TIMER_IRQ),
+
+    .i_INSTR_GNT(UROM_INSTR_GNT),
+    .o_INSTR_REQ(CORE_INSTR_REQ)
 );
 
 /* UROM */
@@ -52,15 +55,23 @@ wire        UROM_CE;
 wire        UROM_REQ;
 wire        UROM_GNT;
 
+wire        CORE_INSTR_REQ;
+wire        UROM_INSTR_GNT;
+
 rom rom0 (
-    .addr_prt1_i(UROM_ADDR_DATA),
-    .addr_prt2_i(UROM_ADDR_INSTR),
-    .hb_i(UROM_HB),
-    .rdata_prt1_o(UROM_RDATA_DATA),
-    .rdata_prt2_o(UROM_RDATA_INSTR),
-    .urom_ce_i(UROM_CE),
-    .urom_req_i(UROM_REQ),
-    .urom_gnt_o(UROM_GNT)
+    .i_CLK(CLK),
+    .i_RSTn(RSTn),
+    .i_CE(UROM_CE),
+    .i_HB(UROM_HB),
+    .i_REQ(BUS_REQ),
+    .i_ADDR_DATA(UROM_ADDR_DATA),
+    .i_ADDR_INSTR(UROM_ADDR_INSTR),
+    .o_RDATA_DATA(UROM_RDATA_DATA),
+    .o_RDATA_INSTR(UROM_RDATA_INSTR),
+    .o_GNT(UROM_GNT),
+
+    .i_INSTR_REQ(CORE_INSTR_REQ),
+    .o_INSTR_GNT(UROM_INSTR_GNT)
 );
 
 assign UROM_ADDR_DATA   = BUS_ADDR;
@@ -165,7 +176,7 @@ assign TIMER_WDATA  = BUS_WDATA;
 assign TIMER_REQ    = BUS_REQ;
 
 /* BUS */
-assign BUS_GNT = UROM_GNT | SRAM_GNT | UART_GNT | TIMER_GNT;
+assign BUS_GNT = UROM_GNT | SRAM_GNT | UART_GNT | TIMER_GNT ;
 
 always @(*) begin
     case (1'b1)

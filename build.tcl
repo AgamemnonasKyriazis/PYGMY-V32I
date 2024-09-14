@@ -12,7 +12,7 @@ read_verilog -v "./rtl/uart.v"
 read_verilog -v "./rtl/ram.v"
 read_verilog -v "./rtl/rom.v"
 read_verilog -v "./rtl/sync_fifo.v"
-
+# read memory sources
 read_mem -q "./sw/image.hex"
 
 # read constraints
@@ -21,11 +21,11 @@ read_xdc "arty.xdc"
 # synth
 synth_design -top "system" -part "xc7a35tcpg236-1"
 
-# optimize
-opt_design
+# Optimize design for area
+opt_design -directive ExploreArea
 
-# place
-place_design
+# Place design with area optimization
+place_design -directive ExtraPostPlacementOpt
 
 # route
 route_design

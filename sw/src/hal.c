@@ -1,4 +1,4 @@
-#include "hal.h"
+#include <hal.h>
 
 void hal_write_32bit(uint32_t addr, uint32_t val) {
     __asm__ volatile ("sw %1, 0(%0)" :: "rK"(addr), "rK"(val));
@@ -38,31 +38,27 @@ void BASE_IRQ_HANDLER(void)
   {
     EXT_IRQ_0_HANDLER();
   }
-
-  if (cause & EXT_SYS_I1_IE)
+  else if (cause & EXT_SYS_I1_IE)
   {
     EXT_IRQ_1_HANDLER();
   }
-
-  if (cause & EXT_SYS_I2_IE)
+  else if (cause & EXT_SYS_I2_IE)
   {
     EXT_IRQ_2_HANDLER();
   }
-
-  if (cause & EXT_SYS_I3_IE)
+  else if (cause & EXT_SYS_I3_IE)
   {
     EXT_IRQ_3_HANDLER();
   }
-
-  if (cause & EXT_SYS_I4_IE)
+  else if (cause & EXT_SYS_I4_IE)
   {
     EXT_IRQ_4_HANDLER();
   }
-
-  if (cause & EXT_SYS_I5_IE)
+  else if (cause & EXT_SYS_I5_IE)
   {
     EXT_IRQ_5_HANDLER();
   }
+  
   return;
 }
 

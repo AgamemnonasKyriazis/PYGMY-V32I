@@ -1,34 +1,33 @@
 `timescale 1ns / 1ps
 
 module regfile (
-    input wire clk_i,
+    input wire i_CLK,
 
-    input wire reg_write_en_i,
-    
-    input wire [4:0] rd_ptr_i,
-    input wire [31:0] rd_i,
+    input wire i_WE,
+    input wire [4:0] i_RD_PTR,
+    input wire [31:0] i_RD,
 
-    input wire [4:0] rs1_ptr_i,
-    output wire [31:0] rs1_o,
+    input wire [4:0] i_RS1_PTR,
+    output wire [31:0] o_RS1,
 
-    input wire [4:0] rs2_ptr_i,
-    output wire [31:0] rs2_o
+    input wire [4:0] i_RS2_PTR,
+    output wire [31:0] o_RS2
 );
 
-reg [31:0] register_arr [0:31];
+reg [31:0] registerArray [0:31];
 
 integer i;
 initial begin
     for (i = 0; i < 32; i=i+1)
-        register_arr[i] <= 32'd0;
+        registerArray[i] <= 32'd0;
 end
 
-always @(negedge clk_i) begin
-    if ( (reg_write_en_i) & (|rd_ptr_i) )
-        register_arr[rd_ptr_i] <= rd_i;
+always @(negedge i_CLK) begin
+    if ( (i_WE) & (|i_RD_PTR) )
+        registerArray[i_RD_PTR] <= i_RD;
 end
 
-assign rs1_o = register_arr[rs1_ptr_i];
-assign rs2_o = register_arr[rs2_ptr_i];
+assign o_RS1 = registerArray[i_RS1_PTR];
+assign o_RS2 = registerArray[i_RS2_PTR];
 
 endmodule

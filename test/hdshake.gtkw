@@ -1,0 +1,64 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sat Aug 31 11:05:18 2024
+[*]
+[dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
+[dumpfile_mtime] "Sat Aug 31 11:04:41 2024"
+[dumpfile_size] 62060661
+[savefile] "/home/agamemnon/Desktop/PYGMY/test/hdshake.gtkw"
+[timestart] 12843000
+[size] 1850 1016
+[pos] -51 -51
+*-19.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top_tb.
+[treeopen] top_tb.sys0.
+[treeopen] top_tb.sys0.core0.
+[treeopen] top_tb.sys0.core0.decodeUnit.
+[treeopen] top_tb.sys0.core0.executeUnit.
+[sst_width] 368
+[signals_width] 299
+[sst_expanded] 1
+[sst_vpaned_height] 609
+@28
+top_tb.sys0.core0.decodeUnit.i_CLK
+top_tb.sys0.core0.decodeUnit.i_EN
+@200
+-decode
+@28
+top_tb.sys0.core0.decodeUnit.isAluImm
+top_tb.sys0.core0.decodeUnit.isAluReg
+top_tb.sys0.core0.decodeUnit.isAuipc
+top_tb.sys0.core0.decodeUnit.isBranch
+top_tb.sys0.core0.decodeUnit.isEcall
+top_tb.sys0.core0.decodeUnit.isFollowed
+top_tb.sys0.core0.decodeUnit.isJal
+top_tb.sys0.core0.decodeUnit.isJalr
+top_tb.sys0.core0.decodeUnit.isLoad
+top_tb.sys0.core0.decodeUnit.isLui
+top_tb.sys0.core0.decodeUnit.isMret
+top_tb.sys0.core0.decodeUnit.isNoop
+top_tb.sys0.core0.decodeUnit.isStore
+@200
+-
+@22
+top_tb.sys0.core0.decodeUnit.i_INSTRUCTION[31:0]
+@28
+top_tb.sys0.core0.decodeUnit.opcode[6:0]
+@200
+-
+@28
+top_tb.sys0.core0.decode_core_mode
+@200
+-
+@28
+top_tb.sys0.rom0.clk_i
+top_tb.sys0.core0.instr_OK
+top_tb.sys0.rom0.ready_i
+top_tb.sys0.rom0.valid_o
+@22
+[color] 4
+top_tb.sys0.core0.decodeUnit.pc[31:0]
+[color] 4
+top_tb.sys0.core0.decodeUnit.instruction[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

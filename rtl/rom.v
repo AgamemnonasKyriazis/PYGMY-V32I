@@ -1,61 +1,95 @@
 `timescale 1ns / 1ps
 
-module rom (
-    input wire [31:0] addr_prt1_i,
-    input wire [31:0] addr_prt2_i,
-    input wire [1:0] hb_i,
-    output reg [31:0] rdata_prt1_o,
-    output reg [31:0] rdata_prt2_o,
+module rom #(
+    parameter SIZE = 1024
+) (
+    input  wire         i_CLK,
+    input  wire         i_RSTn,
+    input  wire         i_CE,
+    input  wire [1:0]   i_HB,
+    input  wire         i_REQ,
+    input  wire [31:0]  i_ADDR_DATA,
+    input  wire [31:0]  i_ADDR_INSTR,
+    output wire [31:0]  o_RDATA_DATA,
+    output wire [31:0]  o_RDATA_INSTR,
+    output wire         o_GNT,
 
-    input wire urom_ce_i,
-    input wire urom_req_i,
-    output wire urom_gnt_o
+    input  wire         i_INSTR_REQ,
+    output reg          o_INSTR_GNT
 );
 
-wire [31:0] addr_1, addr_2;
-
-localparam SIZE = 1*1024;
-
-reg [31:0] rom [0:SIZE-1];
+(* rom_style = "block" *) reg [31:0] rom [0:SIZE-1];
 
 initial begin
     $readmemh("../sw/image.hex", rom);
 end
 
-wire [31:0] rdata = rom[addr_1];
+wire [31:0] addr_1 = i_ADDR_DATA >> 2;
+wire [31:0] addr_2 = i_ADDR_INSTR >> 2;
+
+wire [31:0] data  = rom[addr_1];
+wire [31:0] instr = rom[addr_2];
+
+reg  [31:0] instr_d;
+reg  [31:0] instr_q;
+
+reg  [31:0] rdata_d;
+reg  [31:0] rdata_q;
+reg         data_gnt;
 
 always @(*) begin
-    if (urom_ce_i)
-    case (hb_i)
+    case (i_HB)
     2'b00 : begin
-        case (addr_prt1_i[1:0])
-        2'b00   : rdata_prt1_o <= {24'b0, rom[addr_1][7:0]};
-        2'b01   : rdata_prt1_o <= {24'b0, rom[addr_1][15:8]};
-        2'b10   : rdata_prt1_o <= {24'b0, rom[addr_1][23:16]};
-        2'b11   : rdata_prt1_o <= {24'b0, rom[addr_1][31:24]};
-        endcase
+    case (i_ADDR_DATA[1:0])
+    2'b00   : rdata_d <= {24'b0, data[7:0]};
+    2'b01   : rdata_d <= {24'b0, data[15:8]};
+    2'b10   : rdata_d <= {24'b0, data[23:16]};
+    2'b11   : rdata_d <= {24'b0, data[31:24]};
+    default : rdata_d <= {24'b0, data[7:0]};
+    endcase
     end
     2'b01 : begin
-        case (addr_prt1_i[1:0])
-        2'b10   : rdata_prt1_o <= {16'b0, rom[addr_1][31:16]};
-        default : rdata_prt1_o <= {16'b0, rom[addr_1][15:0]};
-        endcase
-    end
-    default : begin
-        rdata_prt1_o <= rom[addr_1];
-    end
+    case (i_ADDR_DATA[1:0])
+    2'b10   : rdata_d <= {16'b0, data[31:16]};
+    default : rdata_d <= {16'b0, data[15:0]};
     endcase
+    end
+    default : rdata_d <= data;
+    endcase
+end
+
+always @(posedge i_CLK) begin
+    if (i_CE)
+        rdata_q <= rdata_d;
     else
-        rdata_prt1_o <= 32'd0;
+        rdata_q <= 32'd0;
+end
+
+always @(posedge i_CLK) begin
+    if (~i_RSTn)
+        data_gnt <= 1'b0;
+    else
+        data_gnt <= i_REQ & i_CE;
 end
 
 always @(*) begin
-    rdata_prt2_o = rom[addr_2];
+    instr_d <= instr;
 end
 
-assign addr_1 = addr_prt1_i >> 2;
-assign addr_2 = addr_prt2_i >> 2;
+always @(posedge i_CLK) begin
+    instr_q <= instr_d;
+end
 
-assign urom_gnt_o = urom_req_i & urom_ce_i;
+always @(posedge i_CLK) begin
+    if (~i_RSTn)
+        o_INSTR_GNT <= 1'b0;
+    else
+        o_INSTR_GNT <= i_INSTR_REQ & ~o_INSTR_GNT;
+end
+
+
+assign o_GNT = data_gnt;
+assign o_RDATA_DATA  = rdata_q;
+assign o_RDATA_INSTR = instr_q;
 
 endmodule

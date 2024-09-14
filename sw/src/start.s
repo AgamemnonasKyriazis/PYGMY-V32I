@@ -49,10 +49,9 @@ _MSYSIE:
     sw s9, 24(sp)
     sw s10, 20(sp)
     sw s11, 16(sp)
-    # Begin of actual trap excecution
+    
     call BASE_IRQ_HANDLER
-    # End of actual trap excecution
-    # Restore the context
+                            # Restore the context
     lw ra, 124(sp)          # Restore return address
     lw t0, 120(sp)          # Restore temporary registers
     lw t1, 116(sp)

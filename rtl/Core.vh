@@ -1,3 +1,2 @@
-localparam UROM_BASE    = 32'h00000000;
-localparam SRAM_BASE    = 32'h01000000;
-localparam UART_BASE    = 32'h02000000;
+localparam [7:0] USER     = 8'b00000001;
+localparam [7:0] MACHINE  = 8'b00000010;

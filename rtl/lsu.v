@@ -7,6 +7,7 @@ module lsu (
     input   wire        i_WE,
     input   wire        i_RE,
     input   wire [1:0]  i_HB,
+    input   wire        i_ULOAD,
     output  wire [31:0] o_RDATA,
 
     /* BUS */
