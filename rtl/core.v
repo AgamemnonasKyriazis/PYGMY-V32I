@@ -11,7 +11,6 @@ module core (
     output  wire        o_BUS_RE,
     output  wire [1:0]  o_BUS_HB,
     output  wire        o_BUS_REQ,
-    output  wire [7:0]  o_BUS_CE,
 
     input   wire        i_MEI_0,
     input   wire        i_MEI_1,
@@ -21,7 +20,7 @@ module core (
     input   wire        i_MEI_5,
 
     input   wire        i_INSTR_GNT,
-    output  reg         o_INSTR_REQ
+    output  wire        o_INSTR_REQ
 );
 
 `include "Core.vh"
@@ -31,7 +30,22 @@ module core (
 wire [7:0]  coreState;
 
 /*---------------------------------- INSTRUCTION FETCH ------------------------------------*/
-wire [31:0] instruction = i_INSTRUCTION;
+wire instruction_is_valid;
+wire [31:0] instruction;
+
+fetch fetchUnit (
+    .i_CLK(i_CLK),
+    .i_RSTn(i_RSTn),
+    .i_EN(1'b1),
+    .i_CORE_STATE(coreState),
+    .i_INSTRUCTION_GNT(i_INSTR_GNT),
+    .i_INSTRUCTION(i_INSTRUCTION),
+    .i_INSTRUCTION_FETCH_NEXT(en_decode),
+    .o_INSTRUCTION_REQ(o_INSTR_REQ),
+    .o_INSTRUCTION(instruction),
+    .o_INSTRUCTION_VALID(instruction_is_valid)
+);
+
 wire [31:0] pc;
 
 /*------------------------------ DECODE - EXECUTE STAGE -----------------------------------*/
@@ -66,20 +80,8 @@ wire [31:0] csr_mtvec;
 wire [31:0] csr_mepc;
 
 /*------------------------------------ DECODE ---------------------------------------------*/
-wire en_decode = ~( (|o_BUS_CE[3:0]) & (o_BUS_REQ) & (~i_BUS_GNT) );
+wire en_decode = ~( (o_BUS_REQ) & (~i_BUS_GNT) );
 wire en_execute;
-
-always @(posedge i_CLK) begin
-    if (~i_RSTn)
-        o_INSTR_REQ <= 1'b1;
-    else begin
-        if (instruction_is_valid)
-            o_INSTR_REQ <= 1'b0;
-        else
-            o_INSTR_REQ <= 1'b1;
-    end
-end
-wire instruction_is_valid = i_INSTR_GNT & o_INSTR_REQ;
 
 decode decodeUnit (
     .i_CLK(i_CLK),
@@ -166,7 +168,6 @@ execute executeUnit (
     .o_BUS_WE(o_BUS_WE),
     .o_BUS_RE(o_BUS_RE),
     .o_BUS_HB(o_BUS_HB),
-    .o_BUS_CE(o_BUS_CE),
     .o_BUS_REQ(o_BUS_REQ),
     .i_BUS_GNT(i_BUS_GNT),
 

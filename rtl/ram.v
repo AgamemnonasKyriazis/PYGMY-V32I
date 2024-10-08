@@ -19,8 +19,6 @@ module ram #(
     input wire we_i,
     /* half-word/byte */
     input wire [1:0] hb_i,
-    /* load unsigned */
-    input wire uload_i,
     /* data bus out */
     output reg [31:0] rdata_o
 );

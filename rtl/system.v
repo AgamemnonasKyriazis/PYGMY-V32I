@@ -8,15 +8,28 @@ module system(
 wire CLK = i_CLK;
 wire RSTn = ~i_RST;
 
+wire [31:0] CORE_ADDR;
+
 wire [31:0] BUS_WDATA;
-wire [31:0] BUS_ADDR;
+wire [31:0] BUS_ADDR = {4'h0, CORE_ADDR[27:0]};
 reg  [31:0] BUS_RDATA;
 wire        BUS_WE;
 wire        BUS_RE;
 wire [1:0]  BUS_HB;
 wire        BUS_GNT;
 wire        BUS_REQ;
-wire [7:0]  BUS_CE;
+reg  [7:0]  BUS_CE;
+
+/* BUS CE DECODE */
+always @* begin
+    case (CORE_ADDR[31:28])
+    4'h0, 4'h1 : BUS_CE <= 8'b00000001;
+    4'h2, 4'h3 : BUS_CE <= 8'b00000010;
+    4'h4, 4'h5 : BUS_CE <= 8'b00000100;
+    4'h6, 4'h7 : BUS_CE <= 8'b00001000;
+    default    : BUS_CE <= 8'b00000000;
+    endcase
+end
 
 core core0 (
     .i_CLK(CLK),
@@ -26,12 +39,11 @@ core core0 (
     .i_BUS_GNT(BUS_GNT),
     .o_PC(UROM_ADDR_INSTR),
     .o_BUS_WDATA(BUS_WDATA),
-    .o_BUS_ADDR(BUS_ADDR),
+    .o_BUS_ADDR(CORE_ADDR),
     .o_BUS_WE(BUS_WE),
     .o_BUS_RE(BUS_RE),
     .o_BUS_HB(BUS_HB),
     .o_BUS_REQ(BUS_REQ),
-    .o_BUS_CE(BUS_CE),
 
     .i_MEI_0(UART_IRQ[0]),
     .i_MEI_1(1'b0),
@@ -101,7 +113,6 @@ ram ram0 (
     .addr_i(SRAM_ADDR),
     .we_i(SRAM_WE),
     .hb_i(SRAM_HB),
-    .uload_i(SRAM_UL),
     .rdata_o(SRAM_RDATA)
 );
 
@@ -110,7 +121,6 @@ assign SRAM_ADDR    = BUS_ADDR;
 assign SRAM_WE      = BUS_WE;
 assign SRAM_RE      = BUS_RE;
 assign SRAM_HB      = BUS_HB;
-assign SRAM_UL      = 1'b0;
 assign SRAM_CE      = BUS_CE[1];
 assign SRAM_REQ     = BUS_REQ;
 
@@ -146,7 +156,7 @@ assign UART_RX      = i_UART_TXD;
 
 assign UART_WDATA   = BUS_WDATA;
 assign UART_WE      = BUS_WE & UART_CE;
-assign UART_RE      = ~BUS_WE & UART_CE;
+assign UART_RE      = BUS_RE & UART_CE;
 assign UART_CE      = BUS_CE[2];
 assign UART_REQ     = BUS_REQ; 
 

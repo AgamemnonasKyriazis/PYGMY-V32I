@@ -1,0 +1,9 @@
+localparam  [31:0]  MRET      = 32'h302;
+localparam  [31:0]  MIE       = 32'h304;
+localparam  [31:0]  MTVEC     = 32'h305;
+localparam  [31:0]  MSCRATCH  = 32'h340;
+localparam  [31:0]  MEPC      = 32'h341;
+localparam  [31:0]  MCAUSE    = 32'h342;
+localparam  [31:0]  MTVAL     = 32'h343;
+localparam  [31:0]  MCYCLE    = 32'hB00;
+localparam  [31:0]  MCYCLEH   = 32'hB80;

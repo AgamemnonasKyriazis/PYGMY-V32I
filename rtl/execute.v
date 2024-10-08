@@ -40,7 +40,6 @@ module execute (
     output  wire        o_BUS_WE,
     output  wire        o_BUS_RE,
     output  wire [1:0]  o_BUS_HB,
-    output  wire [7:0]  o_BUS_CE,
     output  wire        o_BUS_REQ,
     input   wire        i_BUS_GNT,
 
@@ -115,7 +114,6 @@ lsu loadStoreUnit (
     .o_BUS_WE(o_BUS_WE),
     .o_BUS_RE(o_BUS_RE),
     .o_BUS_HB(o_BUS_HB),
-    .o_BUS_CE(o_BUS_CE),
     .o_BUS_REQ(o_BUS_REQ),
     .i_BUS_GNT(i_BUS_GNT)
 );

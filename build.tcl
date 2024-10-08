@@ -1,6 +1,7 @@
 # read design sources
 read_verilog -v "./rtl/core.v"
 read_verilog -v "./rtl/system.v"
+read_verilog -v "./rtl/fetch.v"
 read_verilog -v "./rtl/decode.v"
 read_verilog -v "./rtl/execute.v"
 read_verilog -v "./rtl/alu.v"

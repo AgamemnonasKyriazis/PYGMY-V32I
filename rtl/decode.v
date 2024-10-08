@@ -45,11 +45,11 @@ module decode(
 
 `include "Instruction_Set.vh"
 
-localparam MRET_IMM  = 32'h302;
+`include "control_status_registers.vh"
 
 wire stall = ~i_EN;
 
-wire [31:0] instruction = (enterTrap | ~i_INSTRUCTION_VALID)? NOOP : i_INSTRUCTION;
+wire [31:0] instruction = (enterTrap)? NOOP : i_INSTRUCTION;
 wire [6:0]  opcode      = instruction[6:0];
 
 wire isAluReg       = (opcode == ALU_R);
@@ -62,7 +62,7 @@ wire isLui          = (opcode == LUI);
 wire isAuipc        = (opcode == AUIPC);
 wire isEcall        = (opcode == ECALL);
 wire isJalr         = (opcode == JALR);
-wire isMret         = (isEcall && (IMM_R == MRET_IMM));
+wire isMret         = (isEcall && (IMM_R == MRET));
 wire isNoop         = (instruction == NOOP);
 
 wire [2:0] funct3   = instruction[14:12];

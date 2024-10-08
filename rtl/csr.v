@@ -29,6 +29,7 @@ module csr (
 
 `include "Core.vh"
 `include "Instruction_Set.vh"
+`include "control_status_registers.vh"
 
 localparam CSR_WRITE = 3'b001;
 localparam CSR_SET   = 3'b010;
@@ -73,26 +74,26 @@ always @(posedge i_CLK) begin
         case (1'b1)
         isWrite : begin
             case (i_CSR_RD_PTR)
-            32'h304 : mie_0x304         <=  i_CSR_RD;
-            32'h305 : mtvec_0x305       <=  i_CSR_RD;
-            32'h340 : mscratch_0x340    <=  i_CSR_RD;
-            default : ;
+            MIE       : mie_0x304         <=  i_CSR_RD;
+            MTVEC     : mtvec_0x305       <=  i_CSR_RD;
+            MSCRATCH  : mscratch_0x340    <=  i_CSR_RD;
+            default   : ;
             endcase
         end
         isSet   : begin
             case (i_CSR_RD_PTR)
-            32'h304 : mie_0x304         <=  i_CSR_RD | mie_0x304;
-            32'h305 : mtvec_0x305       <=  i_CSR_RD | mtvec_0x305;
-            32'h340 : mscratch_0x340    <=  i_CSR_RD | mscratch_0x340;
-            default : ;
+            MIE       : mie_0x304         <=  i_CSR_RD | mie_0x304;
+            MTVEC     : mtvec_0x305       <=  i_CSR_RD | mtvec_0x305;
+            MSCRATCH  : mscratch_0x340    <=  i_CSR_RD | mscratch_0x340;
+            default   : ;
             endcase
         end
         isClear : begin
             case (i_CSR_RD_PTR)
-            32'h304 : mie_0x304         <=  ~i_CSR_RD & mie_0x304;
-            32'h305 : mtvec_0x305       <=  ~i_CSR_RD & mtvec_0x305;
-            32'h340 : mscratch_0x340    <=  ~i_CSR_RD & mscratch_0x340;
-            default : ;
+            MIE       : mie_0x304         <=  ~i_CSR_RD & mie_0x304;
+            MTVEC     : mtvec_0x305       <=  ~i_CSR_RD & mtvec_0x305;
+            MSCRATCH  : mscratch_0x340    <=  ~i_CSR_RD & mscratch_0x340;
+            default   : ;
             endcase
         end
         default : begin
@@ -135,15 +136,15 @@ end
 
 always @(*) begin
     case (i_CSR_RD_PTR)
-    32'h304 : csrRd  <= mie_0x304;
-    32'h305 : csrRd  <= mtvec_0x305;
-    32'h340 : csrRd  <= mscratch_0x340;
-    32'h341 : csrRd  <= mepc_0x341;
-    32'h342 : csrRd  <= mcause_0x342;
-    32'h343 : csrRd  <= mtval_0x343;
-    32'hB00 : csrRd  <= mcycle_0xB00;
-    32'hB80 : csrRd  <= mcycleh_0xB80;
-    default : csrRd  <= 32'b0;
+    MIE      : csrRd  <= mie_0x304;
+    MTVEC    : csrRd  <= mtvec_0x305;
+    MSCRATCH : csrRd  <= mscratch_0x340;
+    MEPC     : csrRd  <= mepc_0x341;
+    MCAUSE   : csrRd  <= mcause_0x342;
+    MTVAL    : csrRd  <= mtval_0x343;
+    MCYCLE   : csrRd  <= mcycle_0xB00;
+    MCYCLEH  : csrRd  <= mcycleh_0xB80;
+    default  : csrRd  <= 32'b0;
     endcase
 end
 

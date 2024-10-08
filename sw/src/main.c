@@ -25,6 +25,11 @@ int main()
 
   TIMER->THRESHOLD = (SYS_FREQ>>1);
 
+  int i;
+  i = 0;
+  while (msg[i])
+    UART->DATA = msg[i++];
+
   while (1);
 
   return 0;

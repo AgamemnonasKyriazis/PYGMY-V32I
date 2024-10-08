@@ -1,12 +1,12 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Sep 14 16:59:40 2024
+[*] Sun Sep 15 18:50:54 2024
 [*]
 [dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Sat Sep 14 16:57:11 2024"
-[dumpfile_size] 37965048
+[dumpfile_mtime] "Sun Sep 15 18:49:04 2024"
+[dumpfile_size] 153464580
 [savefile] "/home/agamemnon/Desktop/PYGMY/test/csr.gtkw"
-[timestart] 2819000
+[timestart] 0
 [size] 1850 1016
 [pos] -38 -38
 *-20.000000 5395000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -55,10 +55,15 @@ top_tb.sys0.core0.executeUnit.controlStatusRegs.mie_0x304[31:0]
 @28
 top_tb.sys0.core0.i_INSTR_GNT
 top_tb.sys0.core0.o_INSTR_REQ
-@29
 top_tb.sys0.core0.en_decode
 @22
 top_tb.sys0.core0.i_INSTRUCTION[31:0]
 top_tb.sys0.core0.o_PC[31:0]
+@200
+-IF
+@22
+top_tb.sys0.core0.fetchUnit.o_INSTRUCTION[31:0]
+@29
+top_tb.sys0.core0.fetchUnit.o_INSTRUCTION_VALID
 [pattern_trace] 1
 [pattern_trace] 0
