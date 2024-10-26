@@ -9,14 +9,32 @@ typedef struct uart_instance_t {
   uint8_t DATA;
 } uart_instance_t;
 
-typedef struct timer_instance_t
-{
+typedef struct timer_instance_t {
   uint32_t THRESHOLD;
 } timer_instance_t;
+
+typedef struct
+{
+  uint8_t _0 : 1;
+  uint8_t _1 : 1;
+  uint8_t _2 : 1;
+  uint8_t _3 : 1;
+  uint8_t _4 : 1;
+  uint8_t _5 : 1;
+  uint8_t _6 : 1;
+  uint8_t _7 : 1;
+} _BITS8;
+
+typedef union gpio_instance_t {
+  uint8_t _GPIO;
+  _BITS8 pins;
+} gpio_instance_t;
 
 volatile uart_instance_t* const UART = (uart_instance_t*)(UART_BASE);
 
 volatile timer_instance_t* const TIMER = (timer_instance_t*)(TIMER_BASE);
+
+volatile gpio_instance_t* const GPIO = (gpio_instance_t*)(GPIO_BASE);
 
 int main()
 {  
@@ -24,11 +42,10 @@ int main()
   hal_write_csr(mie, IE_MASK);
 
   TIMER->THRESHOLD = (SYS_FREQ>>1);
-
-  int i;
-  i = 0;
-  while (msg[i])
-    UART->DATA = msg[i++];
+  
+  GPIO->_GPIO = 0;
+  GPIO->pins._0 = 1;
+  GPIO->pins._1 = 1;
 
   while (1);
 

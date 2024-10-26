@@ -13,6 +13,8 @@ read_verilog -v "./rtl/uart.v"
 read_verilog -v "./rtl/ram.v"
 read_verilog -v "./rtl/rom.v"
 read_verilog -v "./rtl/sync_fifo.v"
+read_verilog -v "./rtl/gpio.v"
+
 # read memory sources
 read_mem -q "./sw/image.hex"
 

@@ -2,7 +2,15 @@ module system(
     input  wire i_CLK,
     input  wire i_RST,
     input  wire i_UART_TXD,
-    output wire o_UART_RXD
+    output wire o_UART_RXD,
+    output wire o_GPIO_0,
+    output wire o_GPIO_1,
+    output wire o_GPIO_2,
+    output wire o_GPIO_3,
+    output wire o_GPIO_4,
+    output wire o_GPIO_5,
+    output wire o_GPIO_6,
+    output wire o_GPIO_7
 );
 
 wire CLK = i_CLK;
@@ -27,6 +35,7 @@ always @* begin
     4'h2, 4'h3 : BUS_CE <= 8'b00000010;
     4'h4, 4'h5 : BUS_CE <= 8'b00000100;
     4'h6, 4'h7 : BUS_CE <= 8'b00001000;
+    4'h8, 4'h9 : BUS_CE <= 8'b00010000;
     default    : BUS_CE <= 8'b00000000;
     endcase
 end
@@ -185,16 +194,53 @@ assign TIMER_WE     = BUS_WE;
 assign TIMER_WDATA  = BUS_WDATA;
 assign TIMER_REQ    = BUS_REQ;
 
+/* GPIOs */
+wire        GPIO_CE;
+wire        GPIO_WE;
+wire [31:0] GPIO_WDATA;
+wire        GPIO_REQ;
+wire        GPIO_GNT;
+wire [31:0] GPIO_RDATA;
+wire [0:7]  GPIO;
+gpio gpio_0
+(
+    .i_CLK(CLK),
+    .i_RSTn(RSTn),
+    .i_CE(GPIO_CE),
+    .i_WE(GPIO_WE),
+    .i_WDATA(GPIO_WDATA),
+    .i_REQ(GPIO_REQ),
+    .o_GNT(GPIO_GNT),
+    .o_RDATA(GPIO_RDATA),
+    .o_GPIO(GPIO)
+);
+
+assign GPIO_CE      = BUS_CE[4];
+assign GPIO_WE      = BUS_WE;
+assign GPIO_WDATA   = BUS_WDATA;
+assign GPIO_REQ     = BUS_REQ;
+
 /* BUS */
-assign BUS_GNT = UROM_GNT | SRAM_GNT | UART_GNT | TIMER_GNT ;
+assign BUS_GNT = UROM_GNT | SRAM_GNT | UART_GNT | TIMER_GNT | GPIO_GNT;
 
 always @(*) begin
     case (1'b1)
     UROM_CE     : BUS_RDATA <= UROM_RDATA_DATA;
     SRAM_CE     : BUS_RDATA <= SRAM_RDATA;
     UART_CE     : BUS_RDATA <= UART_RDATA;
+    GPIO_CE     : BUS_RDATA <= GPIO_RDATA;
     default     : BUS_RDATA <= 32'd0;
     endcase
 end
+
+assign {o_GPIO_7,
+        o_GPIO_6,
+        o_GPIO_5,
+        o_GPIO_4,
+        o_GPIO_3,
+        o_GPIO_2,
+        o_GPIO_1,
+        o_GPIO_0 
+} = GPIO;
 
 endmodule

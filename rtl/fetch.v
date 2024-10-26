@@ -24,10 +24,11 @@ always @(posedge i_CLK) begin
     if (~i_RSTn)
         o_INSTRUCTION_REQ <= 1'b1;
     else
-        o_INSTRUCTION_REQ <= ~valid & ~fifo_full;
+        o_INSTRUCTION_REQ <= ~valid; // & ~fifo_full;
 end
 
 /*----------------------------- INSTRUCTION PREFETCH -----------------------------*/
+/*
 wire [31:0] fifo_out;
 wire fifo_full;
 wire fifo_empty;
@@ -45,9 +46,9 @@ sync_fifo #(
     .full_o(fifo_full),
     .empty_o(fifo_empty)
 );
-
-assign o_INSTRUCTION_VALID = ~fifo_empty;
-assign o_INSTRUCTION       = fifo_empty? NOOP : fifo_out;
+*/
+assign o_INSTRUCTION_VALID = valid; //~fifo_empty;
+assign o_INSTRUCTION       = valid? i_INSTRUCTION : NOOP; // fifo_out
 /*--------------------------------------------------------------------------------*/
 
 endmodule
