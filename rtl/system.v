@@ -4,13 +4,13 @@ module system(
     input  wire i_UART_TXD,
     output wire o_UART_RXD,
     output wire o_GPIO_0,
-    output wire o_GPIO_1,
-    output wire o_GPIO_2,
-    output wire o_GPIO_3,
-    output wire o_GPIO_4,
-    output wire o_GPIO_5,
-    output wire o_GPIO_6,
-    output wire o_GPIO_7
+    output wire o_GPIO_1
+    //output wire o_GPIO_2,
+    //output wire o_GPIO_3,
+    //output wire o_GPIO_4,
+    //output wire o_GPIO_5,
+    //output wire o_GPIO_6,
+    //output wire o_GPIO_7
 );
 
 wire CLK = i_CLK;
@@ -232,6 +232,8 @@ always @(*) begin
     default     : BUS_RDATA <= 32'd0;
     endcase
 end
+
+wire o_GPIO_7, o_GPIO_6, o_GPIO_5, o_GPIO_4, o_GPIO_3, o_GPIO_2; 
 
 assign {o_GPIO_7,
         o_GPIO_6,

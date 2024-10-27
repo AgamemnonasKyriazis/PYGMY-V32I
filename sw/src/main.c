@@ -44,8 +44,6 @@ int main()
   TIMER->THRESHOLD = (SYS_FREQ>>1);
   
   GPIO->_GPIO = 0;
-  GPIO->pins._0 = 1;
-  GPIO->pins._1 = 1;
 
   while (1);
 
@@ -56,6 +54,30 @@ void EXT_IRQ_0_HANDLER(void) {
   char byteIn;
   byteIn = UART->DATA;
   UART->DATA = byteIn;
+
+
+  switch (byteIn)
+  {
+  case 0:
+    GPIO->pins._0 = 0;
+    GPIO->pins._1 = 0;
+    break;
+  case 1:
+    GPIO->pins._0 = 1;
+    GPIO->pins._1 = 0;
+    break;
+  case 2:
+    GPIO->pins._0 = 0;
+    GPIO->pins._1 = 1;
+    break;
+  case 3:
+    GPIO->pins._0 = 1;
+    GPIO->pins._1 = 1;
+    break;
+  default:
+    break;
+  }
+
   return;
 }
 
