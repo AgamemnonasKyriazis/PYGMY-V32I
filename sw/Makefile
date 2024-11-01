@@ -1,7 +1,7 @@
 # Variables
 CC = riscv32-unknown-elf-gcc
 CFLAGS = -march=rv32i_zicsr -mabi=ilp32 -O0 -I ./src
-LDFLAGS = -nostartfiles -nostdlib -mno-strict-align -mcmodel=medany -fno-builtin -T link.ld
+LDFLAGS = -specs=nano.specs -specs=nosys.specs -nostartfiles -mno-strict-align -mcmodel=medany -fno-builtin -T link.ld
 OBJCOPY = riscv32-unknown-elf-objcopy
 TARGET = main
 
@@ -9,7 +9,7 @@ TARGET = main
 SRC_DIR = ./src/
 OBJ_DIR = ./obj/
 
-SRCS = start.s hal.c main.c
+SRCS = start.s hal.c syscalls.c main.c
 OBJS = $(patsubst %.s, $(OBJ_DIR)%.o, $(filter %.s, $(SRCS))) $(patsubst %.c, $(OBJ_DIR)%.o, $(filter %.c, $(SRCS)))
 
 # Default rule

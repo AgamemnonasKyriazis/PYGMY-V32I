@@ -19,7 +19,7 @@ initial begin
     uart_tx_buf <= {data, 1'b0, 1'b1};
     #83
     rst <= 0;
-    #10000000
+    #100000000
     $finish;
 end
 
@@ -53,13 +53,7 @@ system sys0 (
     .i_UART_TXD(uart_tx_buf[0]),
     .o_UART_RXD(),
     .o_GPIO_0(),
-    .o_GPIO_1(),
-    .o_GPIO_2(),
-    .o_GPIO_3(),
-    .o_GPIO_4(),
-    .o_GPIO_5(),
-    .o_GPIO_6(),
-    .o_GPIO_7()
+    .o_GPIO_1()
 );
 
 endmodule

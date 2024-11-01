@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 
 #include <system.h>
 #include <hal.h>
@@ -45,6 +46,8 @@ int main()
   
   GPIO->_GPIO = 0;
 
+  printf("%s", msg);
+
   while (1);
 
   return 0;
@@ -54,36 +57,9 @@ void EXT_IRQ_0_HANDLER(void) {
   char byteIn;
   byteIn = UART->DATA;
   UART->DATA = byteIn;
-
-
-  switch (byteIn)
-  {
-  case 0:
-    GPIO->pins._0 = 0;
-    GPIO->pins._1 = 0;
-    break;
-  case 1:
-    GPIO->pins._0 = 1;
-    GPIO->pins._1 = 0;
-    break;
-  case 2:
-    GPIO->pins._0 = 0;
-    GPIO->pins._1 = 1;
-    break;
-  case 3:
-    GPIO->pins._0 = 1;
-    GPIO->pins._1 = 1;
-    break;
-  default:
-    break;
-  }
-
   return;
 }
 
 void EXT_IRQ_5_HANDLER(void) {
-  int i;
-  i = 0;
-  while (msg[i])
-    UART->DATA = msg[i++];
+  return;
 }

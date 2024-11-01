@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module ram #(
-    parameter SIZE = 1024
+    parameter SIZE = 2*1024
 ) (
     /* system clock */
     input wire clk_i,

@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module rom #(
-    parameter SIZE = 1024
+    parameter SIZE = 2*1024
 ) (
     input  wire         i_CLK,
     input  wire         i_RSTn,
