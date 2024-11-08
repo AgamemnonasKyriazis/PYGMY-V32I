@@ -1,63 +1,84 @@
-#include <stdint.h>
-#include <stddef.h>
+#include <unistd.h>
+#include <errno.h>
 #include <sys/stat.h>
-
-#include <sys.h>
+#include <sys/time.h>
+#include <stddef.h>
+#include <string.h>
 
 #include <system.h>
 
-typedef struct uart_instance_t {
-  uint8_t DATA;
-} uart_instance_t;
+void hex_print(size_t len) {
+  size_t size = len;
+  ((uart_instance_t *)(UART_BASE))->DATA = size;
+  size >>= 8;
+  ((uart_instance_t *)(UART_BASE))->DATA = size;
+  size >>= 8;
+  ((uart_instance_t *)(UART_BASE))->DATA = size;
+  size >>= 8;
+  ((uart_instance_t *)(UART_BASE))->DATA = size;
+}
 
-static volatile uart_instance_t* const UART = (uart_instance_t*)(UART_BASE);
-
-int _close(int fd) {
-    return -1;
+int echo(int fd, const char* ptr, size_t size) {
+  while (*ptr)
+    ((uart_instance_t *)(UART_BASE))->DATA = *ptr++;
 }
 
 int _open(int fd) {
-    return -1;
+  return -1;
+}
+
+int _close(int fd) {
+  return -1;
 }
 
 int _fstat(int fd, struct stat *st) {
-    return 0;
+  st->st_mode = S_IFCHR;
+  return 0;
 }
 
 int _isatty(int fd) {
-    return 1;
+  return 1;
 }
 
 int _lseek(int fd, int ptr, int dir) {
-    return -1;
+  return 0;
 }
 
-int _read(int fd, char *ptr, size_t len) {
-    return -1;
+void _exit(int status) {
+  while (1);
 }
 
+void _kill(int pid, int sig) {
+  return;
+}
+
+int _getpid(void) {
+  return -1;
+}
 
 void *_sbrk(ptrdiff_t incr) {
-    extern char _end;
-    extern char __heap_start$;  // Start of the heap, defined in your linker script
-    extern char __heap_end$;    // End of the heap, defined in your linker script
-    extern char __stack_top$;   // Top of the stack, defined in your linker script
-    static char * curbrk = &_end;
-    void * ret = NULL;
+  extern char __end$;
+  extern char __heap_start$;
+  extern char __heap_end$;
+  static char * curbrk = &__end$;
+  char * ret = NULL;
 
-    curbrk += incr;
-    ret = curbrk - incr;
+  if (((curbrk + incr) < &__end$) || ((curbrk + incr) > &__heap_end$)) {
+    return (void *)-1;
+  }
 
-    return ret;
+  ret = curbrk;
+  curbrk += incr;
+  return ret;
 }
 
-int _write(int fd, const void* ptr, size_t len) {
-    char * str_ptr = (char *)ptr;
-    
-    int i = 0;
+int _read (int fd, char *buf, int count) {
+  int read = 0;
+  return read;
+}
 
-    while (str_ptr[i])
-        UART->DATA = str_ptr[i++];
-
-    return 1;
+int _write(int fd, const void* ptr, ssize_t len) {
+  hex_print(len);
+  hex_print((size_t)(char*)ptr);
+  return len;
 }

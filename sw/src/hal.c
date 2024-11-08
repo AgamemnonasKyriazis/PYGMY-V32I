@@ -1,4 +1,5 @@
 #include <hal.h>
+#include <system.h>
 
 void hal_write_32bit(uint32_t addr, uint32_t val) {
     __asm__ volatile ("sw %1, 0(%0)" :: "rK"(addr), "rK"(val));

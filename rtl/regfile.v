@@ -18,14 +18,25 @@ reg [31:0] registerArray [0:31];
 
 integer i;
 initial begin
+    stack_overflow <= 0;
     for (i = 0; i < 32; i=i+1)
         registerArray[i] <= 32'd0;
 end
 
 always @(negedge i_CLK) begin
-    if ( (i_WE) & (|i_RD_PTR) )
+    if ( (i_WE) & (|i_RD_PTR) ) begin
         registerArray[i_RD_PTR] <= i_RD;
+    end
 end
+
+reg stack_overflow;
+
+always @(negedge i_CLK)
+    if (i_WE)
+        stack_overflow <= (i_RD_PTR == 2) && (i_RD < 32'h20000660);
+    
+always @(posedge stack_overflow)
+    $display("stack overflow");
 
 assign o_RS1 = registerArray[i_RS1_PTR];
 assign o_RS2 = registerArray[i_RS2_PTR];

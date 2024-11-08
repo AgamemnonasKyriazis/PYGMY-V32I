@@ -8,7 +8,7 @@ module lsu (
     input   wire        i_RE,
     input   wire [1:0]  i_HB,
     input   wire        i_ULOAD,
-    output  wire [31:0] o_RDATA,
+    output  reg  [31:0] o_RDATA,
 
     /* BUS */
     input   wire [31:0] i_BUS_RDATA,
@@ -29,6 +29,24 @@ assign o_BUS_WE     = i_WE;
 assign o_BUS_RE     = i_RE;
 assign o_BUS_HB     = i_HB;
 assign o_BUS_REQ    = i_WE | i_RE;
-assign o_RDATA      = i_BUS_RDATA;
+
+wire byteEn = i_HB == 2'b00;
+wire halfEn = i_HB == 2'b01;
+wire wordEn = i_HB == 2'b10;
+
+always @(*) begin
+    case(1'b1)
+    byteEn : begin
+        o_RDATA <= (i_ULOAD)? { 24'b0, i_BUS_RDATA[7:0] } : i_BUS_RDATA;
+    end
+    halfEn : begin
+        o_RDATA <= (i_ULOAD)? { 16'b0, i_BUS_RDATA[15:0] } : i_BUS_RDATA;
+    end
+    wordEn : begin
+        o_RDATA <= i_BUS_RDATA;
+    end
+    endcase
+end
+
 
 endmodule

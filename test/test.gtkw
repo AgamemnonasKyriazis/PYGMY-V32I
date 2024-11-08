@@ -1,36 +1,81 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Mon Jun 24 20:35:27 2024
+[*] Wed Nov  6 23:04:48 2024
 [*]
-[dumpfile] "/home/agamemnon/Desktop/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Mon Jun 24 19:51:47 2024"
-[dumpfile_size] 195542163
-[savefile] "/home/agamemnon/Desktop/PYGMY/test/test.gtkw"
-[timestart] 0
-[size] 1850 1016
-[pos] -88 -88
-*-19.000000 1106400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[dumpfile] "/home/agamemnon/Documents/PYGMY/test/top_tb.vcd"
+[dumpfile_mtime] "Wed Nov  6 22:34:23 2024"
+[dumpfile_size] 614628639
+[savefile] "/home/agamemnon/Documents/PYGMY/test/test.gtkw"
+[timestart] 212731600
+[size] 1850 920
+[pos] -38 -38
+*-17.000000 212943200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
 [treeopen] top_tb.sys0.core0.decodeUnit.
+[treeopen] top_tb.sys0.core0.executeUnit.
 [treeopen] top_tb.sys0.ram0.
-[treeopen] top_tb.u0.
-[treeopen] top_tb.u0.d0.
-[treeopen] top_tb.u0.e0.
-[treeopen] top_tb.u0.uart0.
+[treeopen] top_tb.sys0.uart0.
 [sst_width] 325
-[signals_width] 339
+[signals_width] 285
 [sst_expanded] 1
-[sst_vpaned_height] 609
+[sst_vpaned_height] 388
 @28
-top_tb.u0.d0.i_CLK
-top_tb.u0.d0.i_RSTn
+top_tb.sys0.CLK
+@22
+top_tb.sys0.core0.decodeUnit.i_INSTRUCTION[31:0]
+top_tb.sys0.core0.decodeUnit.o_PC[31:0]
 @200
 -
--SYS
+@22
+top_tb.sys0.core0.decodeUnit.registers.i_RS1_PTR[4:0]
+top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+top_tb.sys0.core0.decodeUnit.registers.i_RS2_PTR[4:0]
+top_tb.sys0.core0.decodeUnit.registers.o_RS2[31:0]
+@200
 -
-@29
-top_tb.sys0.BUS_REQ
+@28
+top_tb.sys0.core0.decodeUnit.isAluImm
+top_tb.sys0.core0.decodeUnit.isAluReg
+top_tb.sys0.core0.decodeUnit.isAuipc
+top_tb.sys0.core0.decodeUnit.isBranch
+top_tb.sys0.core0.decodeUnit.isEcall
+top_tb.sys0.core0.decodeUnit.isFollowed
+top_tb.sys0.core0.decodeUnit.isJal
+top_tb.sys0.core0.decodeUnit.isJalr
+top_tb.sys0.core0.decodeUnit.isLoad
+top_tb.sys0.core0.decodeUnit.isLui
+top_tb.sys0.core0.decodeUnit.isMret
+top_tb.sys0.core0.decodeUnit.isNoop
+top_tb.sys0.core0.decodeUnit.isStore
+@200
+-
+@22
+top_tb.sys0.core0.executeUnit.ALU.op1[31:0]
+top_tb.sys0.core0.executeUnit.ALU.op2[31:0]
+top_tb.sys0.core0.executeUnit.ALU.opcode[3:0]
+@28
+top_tb.sys0.core0.executeUnit.ALU.subtract
+@22
+top_tb.sys0.core0.executeUnit.ALU.res[31:0]
+@200
+-
+-
+@22
+top_tb.sys0.core0.executeUnit.o_RD[31:0]
+top_tb.sys0.core0.executeUnit.o_RD_PTR[4:0]
+@200
+-
+@22
+top_tb.sys0.BUS_ADDR[31:0]
+top_tb.sys0.BUS_WDATA[31:0]
+@28
+top_tb.sys0.BUS_WE
+top_tb.sys0.BUS_RE
+@22
+top_tb.sys0.SRAM_RDATA[31:0]
+@200
+-
 [pattern_trace] 1
 [pattern_trace] 0

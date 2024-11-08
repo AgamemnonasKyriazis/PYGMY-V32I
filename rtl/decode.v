@@ -107,12 +107,12 @@ wire GTU = ~LTU;
 /* Branch is Followed */
 wire isFollowed = 
     (isBranch & 
-    (funct3I[0] & EQ) |
-    (funct3I[1] & NE) |
-    (funct3I[4] & LT) |
-    (funct3I[5] & GT) |
-    (funct3I[6] & LTU)|
-    (funct3I[7] & GTU));
+    ((funct3I[0] & EQ) |
+     (funct3I[1] & NE) |
+     (funct3I[4] & LT) |
+     (funct3I[5] & GT) |
+     (funct3I[6] & LTU)|
+     (funct3I[7] & GTU)));
 
 wire [31:0] IMM_J   = { {11{instruction[31]}}, instruction[31], instruction[19:12], instruction[20], instruction[30:21], 1'b0 };
 wire [31:0] IMM_B   = { {19{instruction[31]}}, instruction[31], instruction[7], instruction[30:25], instruction[11:8], 1'b0 };
@@ -195,7 +195,6 @@ assign o_PC = pc;
 reg         reg_we;
 reg         mem_we;
 reg         mem_re;
-reg [1:0]   hb;
 reg         uload;
 reg         ecall;
 reg         imm;
@@ -237,7 +236,7 @@ assign o_AUIPC  = auipc;
 
 always @(posedge i_CLK) begin : FunctALU
     if (i_EN) begin
-        o_FUNCT3  <= (isAluReg | isAluImm | isEcall)? funct3 : 3'b000;
+        o_FUNCT3  <= (isAluReg | isAluImm | isEcall | isLoad | isStore)? funct3 : 3'b000;
         o_FUNCT7 <= (isAluReg)? funct7 : 7'b0000000;
     end
 end

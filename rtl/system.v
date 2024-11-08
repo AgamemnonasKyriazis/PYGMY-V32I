@@ -30,6 +30,7 @@ reg  [7:0]  BUS_CE;
 
 /* BUS CE DECODE */
 always @* begin
+    if (BUS_RE | BUS_WE)
     case (CORE_ADDR[31:28])
     4'h0, 4'h1 : BUS_CE <= 8'b00000001;
     4'h2, 4'h3 : BUS_CE <= 8'b00000010;
@@ -38,6 +39,8 @@ always @* begin
     4'h8, 4'h9 : BUS_CE <= 8'b00010000;
     default    : BUS_CE <= 8'b00000000;
     endcase
+    else
+    BUS_CE <= 8'b00000000;
 end
 
 core core0 (

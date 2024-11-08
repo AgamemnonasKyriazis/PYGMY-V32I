@@ -63,7 +63,7 @@ module execute (
 reg  [31:0] ALU_op1;
 reg  [31:0] ALU_op2;
 wire [31:0] ALU_res;
-wire [3:0]  ALU_opcode = {i_FUNCT7[6], i_FUNCT3};
+wire [3:0]  ALU_opcode = {i_FUNCT7[6], (i_MEM_RE | i_MEM_WE)? 3'b000 : i_FUNCT3};
 
 always @(*) begin : Op1Selector
     case (1'b1)

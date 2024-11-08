@@ -17,14 +17,14 @@ module fetch (
 
 localparam [31:0] NOOP  =  32'h00000013;
 
-wire valid  =  o_INSTRUCTION_REQ & i_INSTRUCTION_GNT;
+wire valid  =  1;//o_INSTRUCTION_REQ & i_INSTRUCTION_GNT;
 
 /* While instruction is not valid - request */
 always @(posedge i_CLK) begin
     if (~i_RSTn)
         o_INSTRUCTION_REQ <= 1'b1;
     else
-        o_INSTRUCTION_REQ <= ~valid; // & ~fifo_full;
+        o_INSTRUCTION_REQ <= 1;//~valid; // & ~fifo_full;
 end
 
 /*----------------------------- INSTRUCTION PREFETCH -----------------------------*/

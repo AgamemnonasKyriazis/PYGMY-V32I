@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module rom #(
-    parameter SIZE = 2*1024
+    parameter SIZE = 4*1024
 ) (
     input  wire         i_CLK,
     input  wire         i_RSTn,
@@ -76,15 +76,23 @@ always @(*) begin
     instr_d <= instr;
 end
 
-always @(posedge i_CLK) begin
+/*always @(posedge i_CLK) begin
+    instr_q <= instr_d;
+end*/
+
+always @(*) begin
     instr_q <= instr_d;
 end
 
-always @(posedge i_CLK) begin
+/*always @(posedge i_CLK) begin
     if (~i_RSTn)
         o_INSTR_GNT <= 1'b0;
     else
         o_INSTR_GNT <= i_INSTR_REQ & ~o_INSTR_GNT;
+end*/
+
+always @(*) begin
+    o_INSTR_GNT <= 1'b1;
 end
 
 

@@ -27,6 +27,8 @@ wire [4:0] shamt = i_OP2[4:0];
 
 reg [31:0] res;
 
+wire shift = (opcode == SRL) || (opcode == SRA);
+
 always @(*) begin
     case (opcode)
     default : begin
