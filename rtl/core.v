@@ -60,6 +60,7 @@ wire [4:0]  decode_execute_rd_ptr;
 wire [2:0]  decode_execute_funct3;
 wire [6:0]  decode_execute_funct7;
 
+wire [1:0]  decode_execute_alu_op;
 wire        decode_execute_reg_we;
 wire        decode_execute_mem_we;
 wire        decode_execute_mem_re;
@@ -109,6 +110,7 @@ decode decodeUnit (
     .o_RS2(decode_execute_rs2),
     .o_IMM_VAL(decode_execute_imm_val),
 
+    .o_ALU_OP(decode_execute_alu_op),
     .o_REG_WE(decode_execute_reg_we),
     .o_MEM_WE(decode_execute_mem_we),
     .o_MEM_RE(decode_execute_mem_re),
@@ -147,6 +149,7 @@ execute executeUnit (
     .i_IMM_VAL(decode_execute_imm_val),
     
     /* CTRL */
+    .i_ALU_OP(decode_execute_alu_op),
     .i_REG_WE(decode_execute_reg_we),
     .i_MEM_WE(decode_execute_mem_we),
     .i_MEM_RE(decode_execute_mem_re),

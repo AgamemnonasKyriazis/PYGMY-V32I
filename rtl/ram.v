@@ -9,7 +9,7 @@ module ram #(
 
     input wire ce_i,
     input wire req_i,
-    output wire gnt_o,
+    output reg gnt_o,
 
     /* data bus in */
     input wire [31:0] wdata_i,
@@ -32,10 +32,13 @@ wire alignErr = (( wordEn & (addr_i[1] | addr_i[0]) ) |
 
 wire [31:0] addr = addr_i >> 2;
 
+reg [31:0] outBuf;
+
 (* ram_style = "block" *) reg [31:0] sram [0:SIZE-1];
 
 always @(posedge clk_i) begin
-    if (req_i & ce_i & (~alignErr) & we_i) begin
+    if (req_i & ce_i & (~alignErr)) begin
+        if (we_i) begin
         case (1'b1)
         byteEn : begin
             case (addr_i[1:0])
@@ -51,38 +54,44 @@ always @(posedge clk_i) begin
             1'b1 : sram[addr][31:16] <= wdata_i[15:0];
             endcase
         end
-        default : begin
+        wordEn : begin
             sram[addr] <= wdata_i;
         end
         endcase
+        end
+        else begin
+            outBuf <= sram[addr];
+        end
     end
 end
 
 always @(*) begin
-    if (req_i & ce_i & (~alignErr) & (~we_i))
-        case (1'b1)
-        byteEn : begin
-            case (addr_i[1:0])
-            2'b00 : rdata_o <= { {24{sram[addr][7]}} , sram[addr][7:0]   };
-            2'b01 : rdata_o <= { {24{sram[addr][15]}}, sram[addr][15:8]  };
-            2'b10 : rdata_o <= { {24{sram[addr][23]}}, sram[addr][23:16] };
-            2'b11 : rdata_o <= { {24{sram[addr][31]}}, sram[addr][31:24] };
-            endcase 
-        end
-        halfEn : begin
-            case (addr_i[1])
-            1'b0 : rdata_o <= { {16{sram[addr][15]}}, sram[addr][15:0]  };
-            1'b1 : rdata_o <= { {16{sram[addr][31]}}, sram[addr][31:16] };
-            endcase
-        end
-        default : begin
-            rdata_o <= sram[addr];
-        end
+    case (1'b1)
+    byteEn : begin
+        case (addr_i[1:0])
+        2'b00 : rdata_o <= { {24{outBuf[7]}}, outBuf[7:0]   };
+        2'b01 : rdata_o <= { {24{outBuf[15]}}, outBuf[15:8]  };
+        2'b10 : rdata_o <= { {24{outBuf[23]}}, outBuf[23:16] };
+        2'b11 : rdata_o <= { {24{outBuf[31]}}, outBuf[31:24] };
+        endcase 
+    end
+    halfEn : begin
+        case (addr_i[1])
+        1'b0 : rdata_o <= { {16{outBuf[15]}}, outBuf[15:0]  };
+        1'b1 : rdata_o <= { {16{outBuf[31]}}, outBuf[31:16] };
         endcase
-    else
-        rdata_o <= 0;
+    end
+    wordEn : begin
+        rdata_o <= outBuf;
+    end
+    endcase
 end
 
-assign gnt_o = req_i & ce_i;
+always @(posedge clk_i) begin
+    if (~rst_ni)
+        gnt_o <= 1'b0;
+    else
+        gnt_o <= req_i & ce_i & ~gnt_o;
+end
 
 endmodule

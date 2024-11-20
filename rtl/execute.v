@@ -19,6 +19,7 @@ module execute (
     input  wire [31:0]  i_RS2,
     input  wire [31:0]  i_IMM_VAL,
 
+    input  wire [1:0]   i_ALU_OP,
     input  wire         i_REG_WE,
     input  wire         i_MEM_WE,
     input  wire         i_MEM_RE,
@@ -63,7 +64,22 @@ module execute (
 reg  [31:0] ALU_op1;
 reg  [31:0] ALU_op2;
 wire [31:0] ALU_res;
-wire [3:0]  ALU_opcode = {i_FUNCT7[6], (i_MEM_RE | i_MEM_WE)? 3'b000 : i_FUNCT3};
+
+reg [3:0]  ALU_opcode;
+
+always @(*) begin : AluControl
+    case (i_ALU_OP)
+    2'b01   : begin
+        if (~i_IMM)
+            ALU_opcode <= {i_FUNCT7[5], i_FUNCT3};
+        else
+            ALU_opcode <= {1'b0, i_FUNCT3};
+    end
+    default : begin
+        ALU_opcode <= 4'b0;
+    end
+    endcase
+end
 
 always @(*) begin : Op1Selector
     case (1'b1)

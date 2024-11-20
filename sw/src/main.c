@@ -18,19 +18,19 @@ volatile gpio_instance_t* const GPIO = (gpio_instance_t*)(GPIO_BASE);
 
 char buf[64] = {0};
 
-uint8_t loop(uint8_t x) {
-  if (x < 255)
-    return loop(x+1);
-  return x;
+static inline void
+__wfi(void)
+{
+  asm volatile("wfi");
 }
 
 int main()
 {
-  //UART->DATA = loop(1);
-
-  snprintf(buf, 10, "%s", msg);
-
-  while (1);
-
+  hal_write_csr(mie, (EXT_SYS_I5_IE));
+  
+  TIMER->THRESHOLD = 12000UL;
+  
+  __wfi();
+  
   return 0;
 }

@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module rom #(
-    parameter SIZE = 4*1024
+    parameter SIZE = 2*1024
 ) (
     input  wire         i_CLK,
     input  wire         i_RSTn,
@@ -41,17 +41,16 @@ always @(*) begin
     case (i_HB)
     2'b00 : begin
     case (i_ADDR_DATA[1:0])
-    2'b00   : rdata_d <= {24'b0, data[7:0]};
-    2'b01   : rdata_d <= {24'b0, data[15:8]};
-    2'b10   : rdata_d <= {24'b0, data[23:16]};
-    2'b11   : rdata_d <= {24'b0, data[31:24]};
-    default : rdata_d <= {24'b0, data[7:0]};
+    2'b01   : rdata_d <= { {24{data[15]}}, data[15:8] };
+    2'b10   : rdata_d <= { {24{data[23]}}, data[23:16] };
+    2'b11   : rdata_d <= { {24{data[31]}}, data[31:24] };
+    default : rdata_d <= { {24{data[7]}}, data[7:0] };
     endcase
     end
     2'b01 : begin
     case (i_ADDR_DATA[1:0])
-    2'b10   : rdata_d <= {16'b0, data[31:16]};
-    default : rdata_d <= {16'b0, data[15:0]};
+    2'b10   : rdata_d <= { {16{data[31]}}, data[31:16] };
+    default : rdata_d <= { {16{data[15]}}, data[15:0]};
     endcase
     end
     default : rdata_d <= data;
@@ -69,30 +68,19 @@ always @(posedge i_CLK) begin
     if (~i_RSTn)
         data_gnt <= 1'b0;
     else
-        data_gnt <= i_REQ & i_CE;
+        data_gnt <= i_REQ & i_CE & ~data_gnt;
 end
 
 always @(*) begin
     instr_d <= instr;
 end
 
-/*always @(posedge i_CLK) begin
-    instr_q <= instr_d;
-end*/
-
 always @(*) begin
     instr_q <= instr_d;
 end
 
-/*always @(posedge i_CLK) begin
-    if (~i_RSTn)
-        o_INSTR_GNT <= 1'b0;
-    else
-        o_INSTR_GNT <= i_INSTR_REQ & ~o_INSTR_GNT;
-end*/
-
 always @(*) begin
-    o_INSTR_GNT <= 1'b1;
+    o_INSTR_GNT <= 1;//i_INSTR_REQ & ~o_INSTR_GNT;
 end
 
 

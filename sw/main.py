@@ -1,6 +1,6 @@
 import sys
 
-SIZE = 4*1024
+SIZE = 2*1024
 
 with open("readmemfmt.hex", "r") as f:
   lst = f.readlines()

@@ -3,15 +3,15 @@
 
 #define SYS_FREQ        12000000UL
 
-#define UROM_BASE       0x00000000UL
+#define UROM_BASE       0x80000000UL
 
-#define SRAM_BASE       0x20000000UL
+#define SRAM_BASE       0x90000000UL
 
-#define UART_BASE       0x40000000UL
+#define UART_BASE       0xA0000000UL
 
-#define TIMER_BASE      0x60000000UL
+#define TIMER_BASE      0xB0000000UL
 
-#define GPIO_BASE       0x80000000UL
+#define GPIO_BASE       0xC0000000UL
 
 typedef struct uart_instance_t {
   uint8_t DATA;

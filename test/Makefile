@@ -1,5 +1,5 @@
 test:
-	iverilog top_tb.v ../rtl/*.v -I ../rtl/
+	iverilog -g2012 top_tb.v ../rtl/*.v ../rtl/*.sv -I ../rtl/
 	./a.out
 	GDK_BACKEND=x11 gtkwave top_tb.vcd
 

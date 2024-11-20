@@ -1,26 +1,26 @@
 [*]
-[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Nov  6 23:04:48 2024
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Wed Nov 20 21:44:29 2024
 [*]
-[dumpfile] "/home/agamemnon/Documents/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Wed Nov  6 22:34:23 2024"
-[dumpfile_size] 614628639
-[savefile] "/home/agamemnon/Documents/PYGMY/test/test.gtkw"
-[timestart] 212731600
-[size] 1850 920
-[pos] -38 -38
-*-17.000000 212943200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[dumpfile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/top_tb.vcd"
+[dumpfile_mtime] "Wed Nov 20 21:31:32 2024"
+[dumpfile_size] 41262655
+[savefile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/test.gtkw"
+[timestart] 2124540000
+[size] 2174 1321
+[pos] -51 -51
+*-23.599998 2186930000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
 [treeopen] top_tb.sys0.core0.decodeUnit.
 [treeopen] top_tb.sys0.core0.executeUnit.
 [treeopen] top_tb.sys0.ram0.
-[treeopen] top_tb.sys0.uart0.
+[treeopen] top_tb.sys0.timer_ext.
 [sst_width] 325
 [signals_width] 285
 [sst_expanded] 1
-[sst_vpaned_height] 388
+[sst_vpaned_height] 887
 @28
 top_tb.sys0.CLK
 @22
@@ -30,7 +30,44 @@ top_tb.sys0.core0.decodeUnit.o_PC[31:0]
 -
 @22
 top_tb.sys0.core0.decodeUnit.registers.i_RS1_PTR[4:0]
+@c00022
 top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+@28
+(0)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(1)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(2)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(3)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(4)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(5)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(6)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(7)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(8)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(9)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(10)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(11)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(12)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(13)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(14)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(15)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(16)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(17)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(18)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(19)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(20)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(21)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(22)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(23)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(24)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(25)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(26)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(27)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(28)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(29)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(30)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+(31)top_tb.sys0.core0.decodeUnit.registers.o_RS1[31:0]
+@1401200
+-group_end
+@22
 top_tb.sys0.core0.decodeUnit.registers.i_RS2_PTR[4:0]
 top_tb.sys0.core0.decodeUnit.registers.o_RS2[31:0]
 @200
@@ -47,8 +84,20 @@ top_tb.sys0.core0.decodeUnit.isJalr
 top_tb.sys0.core0.decodeUnit.isLoad
 top_tb.sys0.core0.decodeUnit.isLui
 top_tb.sys0.core0.decodeUnit.isMret
-top_tb.sys0.core0.decodeUnit.isNoop
 top_tb.sys0.core0.decodeUnit.isStore
+top_tb.sys0.core0.decodeUnit.isNoop
+top_tb.sys0.core0.decodeUnit.isWfi
+@200
+-
+@22
+top_tb.sys0.core0.decodeUnit.coreState[7:0]
+@28
+top_tb.sys0.core0.executeUnit.controlStatusRegs.o_IRQ
+@200
+-
+@22
+top_tb.sys0.core0.executeUnit.CSR_rd[31:0]
+top_tb.sys0.core0.executeUnit.CSR_rd_ptr[11:0]
 @200
 -
 @22
@@ -56,26 +105,20 @@ top_tb.sys0.core0.executeUnit.ALU.op1[31:0]
 top_tb.sys0.core0.executeUnit.ALU.op2[31:0]
 top_tb.sys0.core0.executeUnit.ALU.opcode[3:0]
 @28
+top_tb.sys0.core0.executeUnit.i_FUNCT3[2:0]
+@22
+top_tb.sys0.core0.executeUnit.i_FUNCT7[6:0]
+@28
 top_tb.sys0.core0.executeUnit.ALU.subtract
 @22
 top_tb.sys0.core0.executeUnit.ALU.res[31:0]
 @200
 -
 -
-@22
-top_tb.sys0.core0.executeUnit.o_RD[31:0]
-top_tb.sys0.core0.executeUnit.o_RD_PTR[4:0]
-@200
--
-@22
-top_tb.sys0.BUS_ADDR[31:0]
-top_tb.sys0.BUS_WDATA[31:0]
 @28
-top_tb.sys0.BUS_WE
-top_tb.sys0.BUS_RE
+top_tb.sys0.core0.executeUnit.loadStoreUnit.o_BUS_REQ
+top_tb.sys0.core0.executeUnit.loadStoreUnit.o_BUS_RE
 @22
-top_tb.sys0.SRAM_RDATA[31:0]
-@200
--
+top_tb.sys0.CORE_ADDR[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

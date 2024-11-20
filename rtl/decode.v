@@ -26,20 +26,23 @@ module decode(
     output reg  [31:0]  o_RS2,
     output reg  [31:0]  o_IMM_VAL,
 
-    output wire         o_REG_WE,
-    output wire         o_MEM_WE,
-    output wire         o_MEM_RE,
-    output wire         o_ECALL,
-    output wire         o_IMM,
-    output wire         o_JAL,
-    output wire         o_LUI,
-    output wire         o_AUIPC,
+    output reg  [1:0]   o_ALU_OP,
+    output reg          o_REG_WE,
+    output reg          o_MEM_WE,
+    output reg          o_MEM_RE,
+    output reg          o_ECALL,
+    output reg          o_IMM,
+    output reg          o_JAL,
+    output reg          o_LUI,
+    output reg          o_AUIPC,
 
     output wire [31:0]  o_PC,
     output reg  [31:0]  o_PC_PIPELINE,
     output reg  [31:0]  o_INSTRUCTION
     /*-----------------------------------*/
 );
+
+parameter RESET_VECTOR = 32'h80000000;
 
 `include "Core.vh"
 
@@ -63,7 +66,9 @@ wire isAuipc        = (opcode == AUIPC);
 wire isEcall        = (opcode == ECALL);
 wire isJalr         = (opcode == JALR);
 wire isMret         = (isEcall && (IMM_R == MRET));
+
 wire isNoop         = (instruction == NOOP);
+wire isWfi          = (instruction == WFI);
 
 wire [2:0] funct3   = instruction[14:12];
 wire [6:0] funct7   = instruction[31:25];
@@ -127,6 +132,7 @@ reg  [7:0]  coreState;
 reg  [7:0]  coreStateNext;
 wire        enterTrap = (i_IRQ == 1'b1) && (coreState == USER);
 wire        leaveTrap = (isMret == 1'b1) && (coreState == MACHINE);
+wire        halt      = (isWfi == 1'b1);
 
 always @(*) begin
     case (coreState)
@@ -183,8 +189,8 @@ end
 
 always @(posedge i_CLK) begin : ProgramPointer
     if (~i_RSTn)
-        pc  <= 32'd0;
-    else if (i_EN && i_INSTRUCTION_VALID)
+        pc  <= RESET_VECTOR;
+    else if (i_EN && i_INSTRUCTION_VALID && (coreState != HALT))
         pc  <= pc_next;
 end
 
@@ -192,52 +198,36 @@ assign o_PC = pc;
 
 
 /* SIGNAL DECODE CONTROL */
-reg         reg_we;
-reg         mem_we;
-reg         mem_re;
-reg         uload;
-reg         ecall;
-reg         imm;
-reg         jal;
-reg         lui;
-reg         auipc;
 
 always @(posedge i_CLK) begin
     if (~i_RSTn) begin
-        reg_we  <= 1'b0;
-        mem_we  <= 1'b0;
-        mem_re  <= 1'b0;
-        ecall   <= 1'b0;
-        imm     <= 1'b0;
-        jal     <= 1'b0;
-        lui     <= 1'b0;
-        auipc   <= 1'b0;
+        o_ALU_OP  <= 2'b0;
+        o_REG_WE  <= 1'b0;
+        o_MEM_WE  <= 1'b0;
+        o_MEM_RE  <= 1'b0;
+        o_ECALL   <= 1'b0;
+        o_IMM     <= 1'b0;
+        o_JAL     <= 1'b0;
+        o_LUI     <= 1'b0;
+        o_AUIPC   <= 1'b0;
     end
     else if (i_EN) begin
-        reg_we  <= isAluReg | isAluImm | isLoad | isJal | isJalr | isLui | isAuipc | isEcall;
-        mem_we  <= isStore;
-        mem_re  <= isLoad;
-        ecall   <= isEcall;
-        imm     <= isAluImm | isLoad | isStore | isJal | isJalr | isLui | isAuipc | isEcall;
-        jal     <= isJal | isJalr;
-        lui     <= isLui;
-        auipc   <= isAuipc;
+        o_ALU_OP  <= {1'b0, isAluReg | isAluImm};
+        o_REG_WE  <= isAluReg | isAluImm | isLoad | isJal | isJalr | isLui | isAuipc | isEcall;
+        o_MEM_WE  <= isStore;
+        o_MEM_RE  <= isLoad;
+        o_ECALL   <= isEcall;
+        o_IMM     <= isAluImm | isLoad | isStore | isJal | isJalr | isLui | isAuipc | isEcall;
+        o_JAL     <= isJal | isJalr;
+        o_LUI     <= isLui;
+        o_AUIPC   <= isAuipc;
     end
 end
 
-assign o_REG_WE = reg_we;
-assign o_MEM_WE = mem_we;
-assign o_MEM_RE = mem_re;
-assign o_ECALL  = ecall;
-assign o_IMM    = imm;
-assign o_JAL    = jal;
-assign o_LUI    = lui;
-assign o_AUIPC  = auipc;
-
-always @(posedge i_CLK) begin : FunctALU
+always @(posedge i_CLK) begin
     if (i_EN) begin
-        o_FUNCT3  <= (isAluReg | isAluImm | isEcall | isLoad | isStore)? funct3 : 3'b000;
-        o_FUNCT7 <= (isAluReg)? funct7 : 7'b0000000;
+        o_FUNCT3 <= funct3;
+        o_FUNCT7 <= funct7;
     end
 end
 
@@ -263,7 +253,7 @@ always @(posedge i_CLK) begin
         isEcall :
             o_IMM_VAL <= IMM_CSR;
         default : 
-            o_IMM_VAL <= ( (isAluReg | isAluImm) && ( (funct3 == 3'h5) || (funct3 == 3'h1) ) )? IMM_SFT : IMM_R;
+            o_IMM_VAL <= ( (funct3 == 3'h5) || (funct3 == 3'h1) )? IMM_SFT : IMM_R;
         endcase
     end
 end

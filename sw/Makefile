@@ -1,9 +1,9 @@
 # Variables
-CC = riscv32-unknown-elf-gcc
-CFLAGS = -g -march=rv32i_zicsr -mabi=ilp32 -Os -I ./src
-LDFLAGS =  -specs=nano.specs -specs=nosys.specs -fno-common -fverbose-asm -nostartfiles -mstrict-align -mcmodel=medany -fno-builtin -fsigned-char -T link.ld -Wl,-Map=out.map
-OBJCOPY = riscv32-unknown-elf-objcopy
-NMVIEW = riscv32-unknown-elf-nm
+CC = riscv64-unknown-elf-gcc
+CFLAGS = -march=rv32i_zicsr_zifencei -mabi=ilp32 -Os -I ./src
+LDFLAGS =  -march=rv32i_zicsr_zifencei -mabi=ilp32 -specs=nano.specs -specs=nosys.specs -fno-common -fverbose-asm -nostartfiles -mstrict-align -mcmodel=medany -fno-builtin -fsigned-char -fdata-sections -ffunction-sections -Wno-unused -T ./link.ld -Wl,--gc-sections
+OBJCOPY = riscv64-unknown-elf-objcopy
+NMVIEW = riscv64-unknown-elf-nm
 TARGET = main
 
 # Define the source and object files
@@ -16,8 +16,8 @@ OBJS = $(patsubst %.s, $(OBJ_DIR)%.o, $(filter %.s, $(SRCS))) $(patsubst %.c, $(
 # Default rule
 all: $(TARGET).bin
 	@$(NMVIEW) -S $(TARGET).elf > symbols.txt
-	@riscv32-unknown-elf-objdump -DS $(TARGET).elf > main_symbols_dump.S
-	@riscv32-unknown-elf-size $(TARGET).elf --format=sysv --radix=16
+	@riscv64-unknown-elf-objdump -DS $(TARGET).elf > main_symbols_dump.S
+	@riscv64-unknown-elf-size $(TARGET).elf --format=sysv --radix=16
 	@hexdump -v -e '"@%04_ax " 1/1 "%02x\n"' $(TARGET).bin > readmemfmt.hex
 	@python3 main.py > image.hex
 	@echo "DONE"

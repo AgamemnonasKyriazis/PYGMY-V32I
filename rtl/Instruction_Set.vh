@@ -1,4 +1,5 @@
 localparam [31:0] NOOP      =   32'h00000013;
+localparam [31:0] WFI       =   32'h10500073;
 
 localparam [6:0] ALU_R      =   7'b0110011;
 localparam [6:0] ALU_I      =   7'b0010011;

@@ -32,7 +32,7 @@ wire shift = (opcode == SRL) || (opcode == SRA);
 always @(*) begin
     case (opcode)
     default : begin
-        res <= op1 + op2 + subtract;
+        res <= op1 + (op2 + subtract);
     end
     OR  : begin
         res <= op1 | op2;

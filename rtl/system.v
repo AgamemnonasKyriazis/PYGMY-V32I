@@ -32,12 +32,13 @@ reg  [7:0]  BUS_CE;
 always @* begin
     if (BUS_RE | BUS_WE)
     case (CORE_ADDR[31:28])
-    4'h0, 4'h1 : BUS_CE <= 8'b00000001;
-    4'h2, 4'h3 : BUS_CE <= 8'b00000010;
-    4'h4, 4'h5 : BUS_CE <= 8'b00000100;
-    4'h6, 4'h7 : BUS_CE <= 8'b00001000;
-    4'h8, 4'h9 : BUS_CE <= 8'b00010000;
-    default    : BUS_CE <= 8'b00000000;
+    4'h8 : BUS_CE <= 8'b00000001;
+    4'h9 : BUS_CE <= 8'b00000010;
+    4'hA : BUS_CE <= 8'b00000100;
+    4'hB : BUS_CE <= 8'b00001000;
+    4'hC : BUS_CE <= 8'b00010000;
+    default : 
+        BUS_CE <= 8'b00000000;
     endcase
     else
     BUS_CE <= 8'b00000000;
@@ -89,7 +90,7 @@ rom rom0 (
     .i_HB(UROM_HB),
     .i_REQ(BUS_REQ),
     .i_ADDR_DATA(UROM_ADDR_DATA),
-    .i_ADDR_INSTR(UROM_ADDR_INSTR),
+    .i_ADDR_INSTR({4'd0, UROM_ADDR_INSTR[27:0]}),
     .o_RDATA_DATA(UROM_RDATA_DATA),
     .o_RDATA_INSTR(UROM_RDATA_INSTR),
     .o_GNT(UROM_GNT),
@@ -224,15 +225,14 @@ assign GPIO_WDATA   = BUS_WDATA;
 assign GPIO_REQ     = BUS_REQ;
 
 /* BUS */
-assign BUS_GNT = UROM_GNT | SRAM_GNT | UART_GNT | TIMER_GNT | GPIO_GNT;
+assign BUS_GNT = (UROM_CE&UROM_GNT) | (SRAM_CE&SRAM_GNT) | (UART_CE&UART_GNT) | (TIMER_CE*TIMER_GNT);
 
 always @(*) begin
     case (1'b1)
     UROM_CE     : BUS_RDATA <= UROM_RDATA_DATA;
     SRAM_CE     : BUS_RDATA <= SRAM_RDATA;
     UART_CE     : BUS_RDATA <= UART_RDATA;
-    GPIO_CE     : BUS_RDATA <= GPIO_RDATA;
-    default     : BUS_RDATA <= 32'd0;
+    default     : BUS_RDATA <= 32'dx;
     endcase
 end
 

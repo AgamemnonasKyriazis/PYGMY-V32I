@@ -7,22 +7,6 @@
 
 #include <system.h>
 
-void hex_print(size_t len) {
-  size_t size = len;
-  ((uart_instance_t *)(UART_BASE))->DATA = size;
-  size >>= 8;
-  ((uart_instance_t *)(UART_BASE))->DATA = size;
-  size >>= 8;
-  ((uart_instance_t *)(UART_BASE))->DATA = size;
-  size >>= 8;
-  ((uart_instance_t *)(UART_BASE))->DATA = size;
-}
-
-int echo(int fd, const char* ptr, size_t size) {
-  while (*ptr)
-    ((uart_instance_t *)(UART_BASE))->DATA = *ptr++;
-}
-
 int _open(int fd) {
   return -1;
 }
@@ -78,7 +62,9 @@ int _read (int fd, char *buf, int count) {
 }
 
 int _write(int fd, const void* ptr, ssize_t len) {
-  hex_print(len);
-  hex_print((size_t)(char*)ptr);
+  
+  for (int i = 0; i < len; i++)
+    ((uart_instance_t *)(UART_BASE))->DATA = *((char*)ptr + i);
+  
   return len;
 }
