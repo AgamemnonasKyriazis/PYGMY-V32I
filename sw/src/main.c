@@ -25,12 +25,7 @@ __wfi(void)
 }
 
 int main()
-{
-  hal_write_csr(mie, (EXT_SYS_I5_IE));
-  
-  TIMER->THRESHOLD = 12000UL;
-  
-  __wfi();
-  
+{ 
+  printf("%s\r\n", msg);
   return 0;
 }

@@ -190,7 +190,33 @@ execute executeUnit (
     .o_CSR_MEPC(csr_mepc)
 );
 
-/*-----------------------------------------------------------------------------------------*/
+/*----------------------------- WISHBONE MASTER INTERFACE ---------------------------------*/
+
+wishbone_master #(
+    .DATA_WIDTH(32),
+    .ADDR_WIDTH(32)
+) wbi_master (
+    .i_RST(~i_RSTn),
+    .i_CLK(i_CLK),
+    .o_ADDR(),
+    .o_DATA(),
+    .i_DATA(),
+    .o_WE(),
+    .o_SEL(),
+    .o_STB(),
+    .i_ACK(),
+    .o_CYC(),
+    .o_TAGN(),
+    .i_TAGN(),
+    
+    .i_LSU_REQ(o_BUS_REQ),
+    .i_LSU_ADDR(o_BUS_ADDR),
+    .i_LSU_DATA(o_BUS_WDATA),
+    .i_LSU_WE(o_BUS_WE),
+    .i_LSU_HB(o_BUS_HB),
+    .o_LSU_DATA(),
+    .o_LSU_GNT()
+);
 
 /*-----------------------------------------------------------------------------------------*/
 
