@@ -49,7 +49,7 @@ always_comb begin
     ram_ce = valid_req & ~ack;
 end
 
-ram block_ram (
+pram #(.SRAM_DEPTH(4096)) block_ram (
     .i_CE(ram_ce),
     .i_CLK(i_CLK),
     .i_WDATA(ram_wdata),

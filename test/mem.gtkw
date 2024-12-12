@@ -1,20 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Fri Dec  6 16:16:05 2024
+[*] Wed Dec 11 22:12:28 2024
 [*]
-[dumpfile] "/home/agamemnon/Documents/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Fri Dec  6 16:13:35 2024"
-[dumpfile_size] 41314195
-[savefile] "/home/agamemnon/Documents/PYGMY/test/mem.gtkw"
+[dumpfile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/top_tb.vcd"
+[dumpfile_mtime] "Wed Dec 11 22:09:19 2024"
+[dumpfile_size] 42072977
+[savefile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/mem.gtkw"
 [timestart] 0
-[size] 1854 1001
-[pos] -51 -51
-*-19.799999 1909000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 2174 1321
+[pos] -151 -151
+*-19.500000 2646000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
 [sst_width] 278
-[signals_width] 166
+[signals_width] 318
 [sst_expanded] 1
 [sst_vpaned_height] 297
 @28
@@ -38,7 +38,18 @@ top_tb.sys0.core0.o_BUS_REQ
 @22
 top_tb.sys0.core0.i_BUS_RDATA[31:0]
 top_tb.sys0.core0.o_BUS_ADDR[31:0]
-@23
 top_tb.sys0.core0.o_BUS_WDATA[31:0]
+@200
+-
+@28
+top_tb.sys0.core0.o_WB_CYC
+top_tb.sys0.core0.o_WB_STB
+top_tb.sys0.core0.i_WB_ACK
+@200
+-
+@22
+top_tb.sys0.wishbone_m_data[31:0]
+top_tb.sys0.wishbone_s_data[31:0]
+top_tb.sys0.wishbone_addr[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

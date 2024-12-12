@@ -66,7 +66,47 @@ core core0 (
     .i_MEI_5(TIMER_IRQ),
 
     .i_INSTR_GNT(UROM_INSTR_GNT),
-    .o_INSTR_REQ(CORE_INSTR_REQ)
+    .o_INSTR_REQ(CORE_INSTR_REQ),
+
+    .o_WB_ADDR(wishbone_addr),
+    .o_WB_DATA(wishbone_m_data),
+    .i_WB_DATA(wishbone_s_data),
+    .o_WB_WE(wishbone_we),
+    .o_WB_SEL(wishbone_sel),
+    .o_WB_STB(wishbone_stb),
+    .i_WB_ACK(wishbone_ack),
+    .o_WB_CYC(wishbone_cyc),
+    .o_WB_TAGN(),
+    .i_WB_TAGN()
+);
+
+/* Wishbone Interface PRAM */
+
+wire [31:0] wishbone_addr;
+wire [31:0] wishbone_m_data;
+wire [31:0] wishbone_s_data;
+wire wishbone_we;
+wire [3:0] wishbone_sel;
+wire wishbone_stb;
+wire wishbone_ack;
+wire wishbone_cyc;
+
+wishbone_slave #(
+    .DATA_WIDTH(32),
+    .ADDR_WIDTH(32)
+) slave_0 (
+    .i_CLK(CLK),
+    .i_RST(~RSTn),
+    .i_ADDR(wishbone_addr),
+    .i_DATA(wishbone_m_data),
+    .o_DATA(wishbone_s_data),
+    .i_WE(wishbone_we),
+    .i_SEL(wishbone_sel),
+    .i_STB(wishbone_stb),
+    .o_ACK(wishbone_ack),
+    .i_CYC(wishbone_cyc),
+    .i_TAGN(),
+    .o_TAGN()
 );
 
 /* UROM */

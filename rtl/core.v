@@ -20,7 +20,19 @@ module core (
     input   wire        i_MEI_5,
 
     input   wire        i_INSTR_GNT,
-    output  wire        o_INSTR_REQ
+    output  wire        o_INSTR_REQ,
+
+
+    output  wire [31:0] o_WB_ADDR,
+    output  wire [31:0] o_WB_DATA,
+    input   wire [31:0] i_WB_DATA,
+    output  wire        o_WB_WE,
+    output  wire [3:0]  o_WB_SEL,
+    output  wire        o_WB_STB,
+    input   wire        i_WB_ACK,
+    output  wire        o_WB_CYC,
+    output  wire        o_WB_TAGN,
+    input   wire        i_WB_TAGN
 );
 
 `include "Core.vh"
@@ -198,16 +210,17 @@ wishbone_master #(
 ) wbi_master (
     .i_RST(~i_RSTn),
     .i_CLK(i_CLK),
-    .o_ADDR(),
-    .o_DATA(),
-    .i_DATA(),
-    .o_WE(),
-    .o_SEL(),
-    .o_STB(),
-    .i_ACK(),
-    .o_CYC(),
-    .o_TAGN(),
-    .i_TAGN(),
+    
+    .o_ADDR(o_WB_ADDR),
+    .o_DATA(o_WB_DATA),
+    .i_DATA(i_WB_DATA),
+    .o_WE(o_WB_WE),
+    .o_SEL(o_WB_SEL),
+    .o_STB(o_WB_STB),
+    .i_ACK(i_WB_ACK),
+    .o_CYC(o_WB_CYC),
+    .o_TAGN(o_WB_TAGN),
+    .i_TAGN(i_WB_TAGN),
     
     .i_LSU_REQ(o_BUS_REQ),
     .i_LSU_ADDR(o_BUS_ADDR),
