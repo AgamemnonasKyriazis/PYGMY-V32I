@@ -118,7 +118,7 @@ always @(posedge i_CLK) begin
         mcause_0x342  <= 32'd0;
     end
     else if (csrEn) begin
-        mcause_0x342[5:0] <= {i_MEI_5, i_MEI_4, i_MEI_3, i_MEI_2, i_MEI_1, i_MEI_0};
+        mcause_0x342[5:0] <= irq_vec;
         mcause_0x342[31]  <= any_irq;
     end
 end
