@@ -20,16 +20,17 @@ initial begin
     uart_tx_buf <= {data, 1'b0, 1'b1};
     #83
     rst <= 0;
-    #50000000
+
+  #100000000
     
     fout_pointer = $fopen("memdump","w");
-    for (i = 0; i < sys0.ram0.SIZE; i+=1)
-        $fwrite(fout_pointer, "%x\t%x\t%c%c%c%c\n", i<<2, sys0.ram0.sram[i], sys0.ram0.sram[i][7:0], sys0.ram0.sram[i][15:8], sys0.ram0.sram[i][23:16], sys0.ram0.sram[i][31:24]);
+    for (i = 0; i < sys0.sram_slave_0.block_ram.SRAM_DEPTH; i+=1)
+        $fwrite(fout_pointer, "%x\t%x\t%c%c%c%c\n", i<<2, sys0.sram_slave_0.block_ram.memory[i], sys0.sram_slave_0.block_ram.memory[i][7:0], sys0.sram_slave_0.block_ram.memory[i][15:8], sys0.sram_slave_0.block_ram.memory[i][23:16], sys0.sram_slave_0.block_ram.memory[i][31:24]);
     $fclose(fout_pointer);
     
     fout_pointer = $fopen("romdump","w");
-    for (i = 0; i < sys0.rom0.SIZE; i+=1)
-        $fwrite(fout_pointer, "%x\t%x\t%c%c%c%c\n", i<<2, sys0.rom0.rom[i],  sys0.rom0.rom[i][7:0], sys0.rom0.rom[i][15:8], sys0.rom0.rom[i][23:16], sys0.rom0.rom[i][31:24]);
+    for (i = 0; i < sys0.urom_slave_0.block_rom.UROM_DEPTH; i+=1)
+        $fwrite(fout_pointer, "%x\t%x\t%c%c%c%c\n", i<<2, sys0.urom_slave_0.block_rom.memory[i], sys0.urom_slave_0.block_rom.memory[i][7:0], sys0.urom_slave_0.block_rom.memory[i][15:8], sys0.urom_slave_0.block_rom.memory[i][23:16], sys0.urom_slave_0.block_rom.memory[i][31:24]);
     $fclose(fout_pointer);
 
     $finish;

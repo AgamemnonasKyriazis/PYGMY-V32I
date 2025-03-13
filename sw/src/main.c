@@ -16,8 +16,6 @@ volatile timer_instance_t* const TIMER = (timer_instance_t*)(TIMER_BASE);
 
 volatile gpio_instance_t* const GPIO = (gpio_instance_t*)(GPIO_BASE);
 
-char buf[64] = {0};
-
 static inline void
 __wfi(void)
 {
@@ -25,7 +23,17 @@ __wfi(void)
 }
 
 int main()
-{ 
-  printf("%s\r\n", msg);
+{
+  hal_write_csr(mie, (EXT_SYS_I5_IE | EXT_SYS_I0_IE));
+  printf("Hello World\n");
   return 0;
+}
+
+void EXT_IRQ_0_HANDLER(void) {
+  UART->DATA = UART->DATA;
+  return;
+}
+
+void EXT_IRQ_5_HANDLER(void) {
+  return;
 }

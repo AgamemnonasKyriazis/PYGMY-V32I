@@ -1,4 +1,4 @@
-module wishbone_slave #(
+module wishbone_sram_slave #(
     parameter DATA_WIDTH = 32,
     parameter ADDR_WIDTH = 32
 ) (
@@ -44,7 +44,7 @@ end
 
 always_comb begin
     ram_we = i_SEL & {4{i_WE}};
-    ram_addr = i_ADDR;
+    ram_addr = i_ADDR >> 2;
     ram_wdata = i_DATA;
     ram_ce = valid_req & ~ack;
 end
@@ -58,5 +58,7 @@ pram #(.SRAM_DEPTH(4096)) block_ram (
     .o_RDATA(ram_rdata),
     .o_VALID(ram_valid)
 );
+
+assign o_TAGN = 1'b0;
 
 endmodule

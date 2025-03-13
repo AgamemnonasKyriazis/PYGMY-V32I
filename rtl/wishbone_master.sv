@@ -12,7 +12,7 @@ module wishbone_master #(
     output logic o_STB,
     input  i_ACK,
     output logic o_CYC,
-    output o_TAGN,
+    output logic o_TAGN,
     input  i_TAGN,
 
     input  i_LSU_REQ,
@@ -20,9 +20,15 @@ module wishbone_master #(
     input  [DATA_WIDTH-1:0] i_LSU_DATA,
     input  i_LSU_WE,
     input  [1:0] i_LSU_HB,
-    output [DATA_WIDTH-1:0] o_LSU_DATA,
+    output logic [DATA_WIDTH-1:0] o_LSU_DATA,
     output logic o_LSU_GNT
 );
+
+enum bit[1:0] {
+    BYTE = 2'b00,
+    HALF = 2'b01,
+    WORD = 2'b10
+} mode;
 
 typedef enum {
     IDLE,
@@ -55,10 +61,52 @@ always_ff @(posedge i_CLK) begin
             if (valid_request) begin
                 o_CYC  <= 1'b1;
                 o_STB  <= 1'b1;
-                o_SEL  <= 4'b1111;
+                case (i_LSU_HB)
+                WORD : begin
+                    o_DATA <= i_LSU_DATA;
+                    o_SEL  <= 4'b1111;
+                end
+                HALF : begin
+                    o_DATA <= {i_LSU_DATA[15:0], i_LSU_DATA[15:0]};
+                    case (i_LSU_ADDR[1:0])
+                    2'b00 : begin
+                        o_SEL  <= 4'b0011;        
+                    end
+                    2'b10 : begin
+                        o_SEL  <= 4'b1100;
+                    end
+                    default : begin
+                        o_SEL  <= 4'b0000;
+                    end
+                    endcase
+                end
+                BYTE : begin
+                    o_DATA <= {i_LSU_DATA[7:0], i_LSU_DATA[7:0], i_LSU_DATA[7:0], i_LSU_DATA[7:0]};
+                    case (i_LSU_ADDR[1:0])
+                    2'b00 : begin
+                        o_SEL  <= 4'b0001;
+                    end
+                    2'b01 : begin
+                        o_SEL  <= 4'b0010;
+                    end
+                    2'b10 : begin
+                        o_SEL  <= 4'b0100;
+                    end
+                    2'b11 : begin
+                        o_SEL  <= 4'b1000;
+                    end
+                    default : begin
+                        o_SEL  <= 4'b0000;
+                    end
+                    endcase
+                end
+                default : begin
+                    o_DATA <= 0;
+                    o_SEL  <= 4'b0000;
+                end
+                endcase
                 o_WE   <= i_LSU_WE;
                 o_ADDR <= i_LSU_ADDR;
-                o_DATA <= i_LSU_DATA;
             end
         end
         TRANS, WAIT_ACK : begin
@@ -102,7 +150,49 @@ always_ff @(posedge i_CLK) begin
     end
 end
 
-assign o_LSU_GNT = i_ACK;
-assign o_LSU_DATA = i_DATA;
+always_comb begin
+    o_LSU_GNT = i_ACK;
+    o_TAGN = 1'b0;
+    case (i_LSU_HB)
+    WORD : begin
+        o_LSU_DATA = i_DATA;
+    end
+    HALF : begin
+        case (i_LSU_ADDR[1:0])
+        2'b00 : begin
+            o_LSU_DATA = {{16{i_DATA[15]}}, i_DATA[15:0]};
+        end
+        2'b10 : begin
+            o_LSU_DATA = {{16{i_DATA[31]}}, i_DATA[31:16]};
+        end
+        default : begin
+            o_LSU_DATA = 0;
+        end
+        endcase
+    end
+    BYTE : begin
+        case (i_LSU_ADDR[1:0])
+        2'b00 : begin
+            o_LSU_DATA = {{24{i_DATA[7]}}, i_DATA[7:0]};
+        end
+        2'b01 : begin
+            o_LSU_DATA = {{24{i_DATA[15]}}, i_DATA[15:8]};
+        end
+        2'b10 : begin
+            o_LSU_DATA = {{24{i_DATA[23]}}, i_DATA[23:16]};
+        end
+        2'b11 : begin
+            o_LSU_DATA = {{24{i_DATA[31]}}, i_DATA[31:24]};
+        end
+        default : begin
+            o_LSU_DATA = 0;
+        end
+        endcase
+    end
+    default : begin
+        o_LSU_DATA = 0;
+    end
+    endcase
+end
 
 endmodule

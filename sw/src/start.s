@@ -3,6 +3,16 @@
 .globl _start
 
 _start:
+
+    #li a1, 0x90000002
+    #li a2, 0x00000000
+    #sh a2, 0(a1)
+    #li a2, 0x0000f3f4
+    #sh a2, 0(a1)
+    #lh a3, 0(a1)
+    #lb a3, 0(a1)
+    #j _halt
+
     # Load gp
     .option push
 	.option norelax

@@ -1,16 +1,9 @@
 module core (
     input   wire        i_CLK,
     input   wire        i_RSTn,
+    
     input   wire [31:0] i_INSTRUCTION,
-    input   wire [31:0] i_BUS_RDATA,
-    input   wire        i_BUS_GNT,
     output  wire [31:0] o_PC,
-    output  wire [31:0] o_BUS_WDATA,
-    output  wire [31:0] o_BUS_ADDR,
-    output  wire        o_BUS_WE,
-    output  wire        o_BUS_RE,
-    output  wire [1:0]  o_BUS_HB,
-    output  wire        o_BUS_REQ,
 
     input   wire        i_MEI_0,
     input   wire        i_MEI_1,
@@ -18,10 +11,6 @@ module core (
     input   wire        i_MEI_3,
     input   wire        i_MEI_4,
     input   wire        i_MEI_5,
-
-    input   wire        i_INSTR_GNT,
-    output  wire        o_INSTR_REQ,
-
 
     output  wire [31:0] o_WB_ADDR,
     output  wire [31:0] o_WB_DATA,
@@ -42,22 +31,8 @@ module core (
 wire [7:0]  coreState;
 
 /*---------------------------------- INSTRUCTION FETCH ------------------------------------*/
-wire instruction_is_valid;
-wire [31:0] instruction;
-
-fetch fetchUnit (
-    .i_CLK(i_CLK),
-    .i_RSTn(i_RSTn),
-    .i_EN(1'b1),
-    .i_CORE_STATE(coreState),
-    .i_INSTRUCTION_GNT(i_INSTR_GNT),
-    .i_INSTRUCTION(i_INSTRUCTION),
-    .i_INSTRUCTION_FETCH_NEXT(en_decode),
-    .o_INSTRUCTION_REQ(o_INSTR_REQ),
-    .o_INSTRUCTION(instruction),
-    .o_INSTRUCTION_VALID(instruction_is_valid)
-);
-
+wire instruction_valid = 1'b1;
+wire [31:0] instruction = i_INSTRUCTION;
 wire [31:0] pc;
 
 /*------------------------------ DECODE - EXECUTE STAGE -----------------------------------*/
@@ -93,8 +68,8 @@ wire [31:0] csr_mtvec;
 wire [31:0] csr_mepc;
 
 /*------------------------------------ DECODE ---------------------------------------------*/
-wire en_decode = ~( (o_BUS_REQ) & (~i_BUS_GNT) );
-wire en_execute;
+wire en_decode = ~( (lsu_req) & (~lsu_gnt) );
+wire en_execute = 1'b1;
 
 decode decodeUnit (
     .i_CLK(i_CLK),
@@ -105,7 +80,7 @@ decode decodeUnit (
     .i_IRQ(csr_irq),
     .o_CORE_STATE(coreState),
 
-    .i_INSTRUCTION_VALID(instruction_is_valid),
+    .i_INSTRUCTION_VALID(instruction_valid),
     .i_INSTRUCTION(instruction),
     .i_MTVEC(csr_mtvec),
     .i_MEPC(csr_mepc),
@@ -140,6 +115,14 @@ decode decodeUnit (
 /*-----------------------------------------------------------------------------------------*/
 
 /*------------------------------------ EXECUTE --------------------------------------------*/
+
+wire [31:0] lsu_rdata;
+wire [31:0] lsu_wdata;
+wire [31:0] lsu_addr;
+wire lsu_we;
+wire [1:0] lsu_byte_en;
+wire lsu_req;
+wire lsu_gnt;
 
 execute executeUnit (
     .i_CLK(i_CLK),
@@ -177,14 +160,13 @@ execute executeUnit (
     .o_REG_WE(reg_we),
 
     /* BUS */
-    .i_BUS_RDATA(i_BUS_RDATA),
-    .o_BUS_WDATA(o_BUS_WDATA), 
-    .o_BUS_ADDR(o_BUS_ADDR),
-    .o_BUS_WE(o_BUS_WE),
-    .o_BUS_RE(o_BUS_RE),
-    .o_BUS_HB(o_BUS_HB),
-    .o_BUS_REQ(o_BUS_REQ),
-    .i_BUS_GNT(i_BUS_GNT),
+    .i_LSU_RDATA(lsu_rdata),
+    .o_LSU_WDATA(lsu_wdata), 
+    .o_LSU_ADDR(lsu_addr),
+    .o_LSU_WE(lsu_we),
+    .o_LSU_HB(lsu_byte_en),
+    .o_LSU_REQ(lsu_req),
+    .i_LSU_GNT(lsu_gnt),
 
     /* EXTERNAL INTERRUPTS */
     .i_MEI_0(i_MEI_0),
@@ -222,13 +204,13 @@ wishbone_master #(
     .o_TAGN(o_WB_TAGN),
     .i_TAGN(i_WB_TAGN),
     
-    .i_LSU_REQ(o_BUS_REQ),
-    .i_LSU_ADDR(o_BUS_ADDR),
-    .i_LSU_DATA(o_BUS_WDATA),
-    .i_LSU_WE(o_BUS_WE),
-    .i_LSU_HB(o_BUS_HB),
-    .o_LSU_DATA(),
-    .o_LSU_GNT()
+    .i_LSU_REQ(lsu_req),
+    .i_LSU_ADDR(lsu_addr),
+    .i_LSU_DATA(lsu_wdata),
+    .i_LSU_WE(lsu_we),
+    .i_LSU_HB(lsu_byte_en),
+    .o_LSU_DATA(lsu_rdata),
+    .o_LSU_GNT(lsu_gnt)
 );
 
 /*-----------------------------------------------------------------------------------------*/

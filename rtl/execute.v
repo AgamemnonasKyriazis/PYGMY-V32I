@@ -35,14 +35,13 @@ module execute (
     output wire         o_REG_WE,
 
     /* BUS */
-    input   wire [31:0] i_BUS_RDATA,
-    output  wire [31:0] o_BUS_WDATA, 
-    output  wire [31:0] o_BUS_ADDR,
-    output  wire        o_BUS_WE,
-    output  wire        o_BUS_RE,
-    output  wire [1:0]  o_BUS_HB,
-    output  wire        o_BUS_REQ,
-    input   wire        i_BUS_GNT,
+    input   wire [31:0] i_LSU_RDATA,
+    output  wire [31:0] o_LSU_WDATA, 
+    output  wire [31:0] o_LSU_ADDR,
+    output  wire        o_LSU_WE,
+    output  wire [1:0]  o_LSU_HB,
+    output  wire        o_LSU_REQ,
+    input   wire        i_LSU_GNT,
 
     /* EXTERNAL INTERRUPTS */
     input   wire i_MEI_0,
@@ -124,14 +123,13 @@ lsu loadStoreUnit (
     .o_RDATA(LSU_rdata),
 
     /* BUS */
-    .i_BUS_RDATA(i_BUS_RDATA),
-    .o_BUS_WDATA(o_BUS_WDATA), 
-    .o_BUS_ADDR(o_BUS_ADDR),
-    .o_BUS_WE(o_BUS_WE),
-    .o_BUS_RE(o_BUS_RE),
-    .o_BUS_HB(o_BUS_HB),
-    .o_BUS_REQ(o_BUS_REQ),
-    .i_BUS_GNT(i_BUS_GNT)
+    .i_LSU_RDATA(i_LSU_RDATA),
+    .o_LSU_WDATA(o_LSU_WDATA), 
+    .o_LSU_ADDR(o_LSU_ADDR),
+    .o_LSU_WE(o_LSU_WE),
+    .o_LSU_HB(o_LSU_HB),
+    .o_LSU_REQ(o_LSU_REQ),
+    .i_LSU_GNT(i_LSU_GNT)
 );
 
 /*---------------------------- CONTROL STATUS REGISTERS -----------------------------------*/
