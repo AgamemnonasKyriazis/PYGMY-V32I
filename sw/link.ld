@@ -14,8 +14,8 @@ ROM_SIZE            = 8k;                /* Must be the same value MEMORY region
 RAM_START_ADDRESS   = 0x90000000;        /* Must be the same value MEMORY region ram ORIGIN above. */
 RAM_SIZE            = 16k;               /* Must be the same value MEMORY region ram LENGTH above. */
 
-STACK_SIZE          = 14k;               /* needs to be calculated for your application */     
-HEAP_SIZE           = 1k;                /* needs to be calculated for your application */
+STACK_SIZE          = 10k;               /* needs to be calculated for your application */     
+HEAP_SIZE           = 6k;                /* needs to be calculated for your application */
 
 SECTIONS
 {

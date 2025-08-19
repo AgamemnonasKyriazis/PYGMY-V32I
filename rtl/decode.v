@@ -88,9 +88,9 @@ wire        reg_we_i = i_REG_WE;
 /* REGISTER FILE */
 regfile registers (
     .i_CLK(i_CLK),
-    .i_WE(i_REG_WE),
-    .i_RD_PTR(i_RD_PTR),
-    .i_RD(i_RD),
+    .i_WE(reg_we_i),
+    .i_RD_PTR(rd_ptr_i),
+    .i_RD(rd_i),
     .i_RS1_PTR(rs1_ptr),
     .o_RS1(rs1),
     .i_RS2_PTR(rs2_ptr),
@@ -130,17 +130,20 @@ wire [31:0] IMM_CSR = { 20'b0, instruction[31:20] };
 /* CORE STATE CONTROL */
 reg  [7:0]  coreState;
 reg  [7:0]  coreStateNext;
-wire        enterTrap = (i_IRQ == 1'b1) && (coreState == USER);
+wire        enterTrap = (i_IRQ == 1'b1) && (coreState == USER || coreState == HALT);
 wire        leaveTrap = (isMret == 1'b1) && (coreState == MACHINE);
 wire        halt      = (isWfi == 1'b1);
 
 always @(*) begin
     case (coreState)
     USER : begin
-        coreStateNext <= (enterTrap)? MACHINE : USER;
+        coreStateNext <= (enterTrap)? MACHINE : (halt)? HALT : USER;
     end
     MACHINE : begin
         coreStateNext <= (leaveTrap)? USER : MACHINE;
+    end
+    HALT    : begin
+        coreStateNext <= (enterTrap)? MACHINE : HALT;
     end
     default : begin
         coreStateNext <= USER;
@@ -190,7 +193,7 @@ end
 always @(posedge i_CLK) begin : ProgramPointer
     if (~i_RSTn)
         pc  <= RESET_VECTOR;
-    else if (i_EN && i_INSTRUCTION_VALID && (coreState != HALT))
+    else if (i_EN && i_INSTRUCTION_VALID)
         pc  <= pc_next;
 end
 

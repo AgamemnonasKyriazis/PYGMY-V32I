@@ -25,7 +25,7 @@ __wfi(void)
 int main()
 {
   hal_write_csr(mie, (EXT_SYS_I5_IE | EXT_SYS_I0_IE));
-  printf("Hello World\n");
+  __wfi();
   return 0;
 }
 

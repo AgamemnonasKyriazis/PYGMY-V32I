@@ -1,26 +1,24 @@
 [*]
-[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Wed Nov 20 21:44:29 2024
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Fri Aug  8 15:04:56 2025
 [*]
-[dumpfile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/top_tb.vcd"
-[dumpfile_mtime] "Wed Nov 20 21:31:32 2024"
-[dumpfile_size] 41262655
-[savefile] "/home/menios/Documents/GitHub/PYGMY-V32I/test/test.gtkw"
-[timestart] 2124540000
-[size] 2174 1321
-[pos] -51 -51
-*-23.599998 2186930000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[dumpfile] "/home/akyriazis/PYGMY-V32I/test/top_tb.vcd"
+[dumpfile_mtime] "Fri Aug  8 15:03:02 2025"
+[dumpfile_size] 73387841
+[savefile] "/home/akyriazis/PYGMY-V32I/test/test.gtkw"
+[timestart] 0
+[size] 2228 1295
+[pos] -154 -419
+*-29.572199 933000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
 [treeopen] top_tb.sys0.core0.decodeUnit.
 [treeopen] top_tb.sys0.core0.executeUnit.
-[treeopen] top_tb.sys0.ram0.
-[treeopen] top_tb.sys0.timer_ext.
 [sst_width] 325
 [signals_width] 285
 [sst_expanded] 1
-[sst_vpaned_height] 887
+[sst_vpaned_height] 834
 @28
 top_tb.sys0.CLK
 @22
@@ -87,6 +85,9 @@ top_tb.sys0.core0.decodeUnit.isMret
 top_tb.sys0.core0.decodeUnit.isStore
 top_tb.sys0.core0.decodeUnit.isNoop
 top_tb.sys0.core0.decodeUnit.isWfi
+top_tb.sys0.core0.decodeUnit.enterTrap
+@29
+top_tb.sys0.core0.decodeUnit.leaveTrap
 @200
 -
 @22
@@ -115,10 +116,5 @@ top_tb.sys0.core0.executeUnit.ALU.res[31:0]
 @200
 -
 -
-@28
-top_tb.sys0.core0.executeUnit.loadStoreUnit.o_BUS_REQ
-top_tb.sys0.core0.executeUnit.loadStoreUnit.o_BUS_RE
-@22
-top_tb.sys0.CORE_ADDR[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

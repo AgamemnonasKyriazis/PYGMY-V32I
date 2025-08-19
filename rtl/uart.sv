@@ -79,7 +79,7 @@ wire tx_fifo_empty;
 // Synchronous FIFO queue for rx module
 sync_fifo #(
     .WIDTH(8),                    // width of data bus
-    .DEPTH(16)                    // depth of FIFO buffer
+    .DEPTH(64)                    // depth of FIFO buffer
 ) rx_sync_fifo (
     .clk_i(i_CLK),                // input clock    
     .rst_ni(~i_RST),              // reset signal
@@ -94,7 +94,7 @@ sync_fifo #(
 // Synchronous FIFO queue for tx module
 sync_fifo #(
     .WIDTH(8),                      // width of data bus
-    .DEPTH(16)                      // depth of FIFO buffer
+    .DEPTH(64)                      // depth of FIFO buffer
 ) tx_sync_fifo (
     .clk_i(i_CLK),                  // input clock
     .rst_ni(~i_RST),                // reset signal

@@ -21,7 +21,7 @@ initial begin
     #83
     rst <= 0;
 
-  #100000000
+   #100000000
     
     fout_pointer = $fopen("memdump","w");
     for (i = 0; i < sys0.sram_slave_0.block_ram.SRAM_DEPTH; i+=1)

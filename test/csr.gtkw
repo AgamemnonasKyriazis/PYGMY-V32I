@@ -1,24 +1,25 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sat Nov  2 12:10:54 2024
+[*] Fri Aug  8 14:00:13 2025
 [*]
-[dumpfile] "/home/agamemnon/Documents/PYGMY/test/top_tb.vcd"
-[dumpfile_mtime] "Sat Nov  2 12:10:20 2024"
-[dumpfile_size] 86687684
-[savefile] "/home/agamemnon/Documents/PYGMY/test/csr.gtkw"
-[timestart] 0
-[size] 1850 1016
-[pos] -88 -88
-*-26.000000 749000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[dumpfile] "/home/akyriazis/PYGMY-V32I/test/top_tb.vcd"
+[dumpfile_mtime] "Fri Aug  8 13:53:57 2025"
+[dumpfile_size] 85059497
+[savefile] "/home/akyriazis/PYGMY-V32I/test/csr.gtkw"
+[timestart] 2540717000
+[size] 2228 1295
+[pos] -151 -230
+*-18.000000 2541709000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
 [treeopen] top_tb.sys0.core0.decodeUnit.
 [treeopen] top_tb.sys0.core0.executeUnit.
+[treeopen] top_tb.uart0.
 [sst_width] 368
 [signals_width] 299
 [sst_expanded] 1
-[sst_vpaned_height] 609
+[sst_vpaned_height] 834
 @28
 top_tb.sys0.core0.decodeUnit.i_CLK
 top_tb.sys0.core0.decodeUnit.i_EN
@@ -43,8 +44,6 @@ top_tb.sys0.core0.decodeUnit.leaveTrap
 @200
 -
 @22
-top_tb.sys0.timer_ext.interval[31:0]
-top_tb.sys0.timer_ext.cycles[31:0]
 top_tb.sys0.core0.decodeUnit.coreState[7:0]
 @200
 -
@@ -53,8 +52,6 @@ top_tb.sys0.core0.executeUnit.controlStatusRegs.mie_0x304[31:0]
 @200
 -
 @28
-top_tb.sys0.core0.i_INSTR_GNT
-top_tb.sys0.core0.o_INSTR_REQ
 top_tb.sys0.core0.en_decode
 @22
 top_tb.sys0.core0.i_INSTRUCTION[31:0]
@@ -62,8 +59,15 @@ top_tb.sys0.core0.o_PC[31:0]
 @200
 -IF
 @22
-top_tb.sys0.core0.fetchUnit.o_INSTRUCTION[31:0]
+top_tb.uart0.i_SEL[3:0]
+@820
+top_tb.uart0.i_DATA[31:0]
+@22
+top_tb.uart0.i_ADDR[31:0]
+@28
+top_tb.uart0.i_CYC
+top_tb.uart0.i_STB
 @29
-top_tb.sys0.core0.fetchUnit.o_INSTRUCTION_VALID
+top_tb.uart0.o_ACK
 [pattern_trace] 1
 [pattern_trace] 0
