@@ -19,6 +19,6 @@ with open("readmemfmt.hex", "r") as f:
   i+=1
 
   for _ in range(i, SIZE):
-    print('00000000')
+    print('DEADBEEF')
 print(i, file=sys.stderr)
       

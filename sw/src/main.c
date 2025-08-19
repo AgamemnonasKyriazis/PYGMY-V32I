@@ -26,6 +26,7 @@ int main()
 {
   hal_write_csr(mie, (EXT_SYS_I5_IE | EXT_SYS_I0_IE));
   __wfi();
+  UART->DATA = 'b';
   return 0;
 }
 

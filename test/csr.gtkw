@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Fri Aug  8 14:00:13 2025
+[*] Tue Aug 19 14:27:57 2025
 [*]
 [dumpfile] "/home/akyriazis/PYGMY-V32I/test/top_tb.vcd"
-[dumpfile_mtime] "Fri Aug  8 13:53:57 2025"
-[dumpfile_size] 85059497
+[dumpfile_mtime] "Tue Aug 19 14:18:34 2025"
+[dumpfile_size] 73593339
 [savefile] "/home/akyriazis/PYGMY-V32I/test/csr.gtkw"
-[timestart] 2540717000
+[timestart] 2387366000
 [size] 2228 1295
-[pos] -151 -230
-*-18.000000 2541709000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -208 -10
+*-19.000000 2388823000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
@@ -39,8 +39,10 @@ top_tb.sys0.core0.decodeUnit.i_IRQ
 top_tb.sys0.core0.coreState[7:0]
 top_tb.sys0.core0.decodeUnit.coreStateNext[7:0]
 @28
-top_tb.sys0.core0.decodeUnit.enterTrap
-top_tb.sys0.core0.decodeUnit.leaveTrap
+top_tb.sys0.core0.decodeUnit.isMret
+top_tb.sys0.core0.decodeUnit.isNoop
+@29
+top_tb.sys0.core0.decodeUnit.isWfi
 @200
 -
 @22
@@ -67,7 +69,6 @@ top_tb.uart0.i_ADDR[31:0]
 @28
 top_tb.uart0.i_CYC
 top_tb.uart0.i_STB
-@29
 top_tb.uart0.o_ACK
 [pattern_trace] 1
 [pattern_trace] 0

@@ -21,7 +21,7 @@ module pram #(
 initial begin
     integer i;
     for (i = 0; i < SRAM_DEPTH; i=i+1) begin
-        memory[i] <= 0;
+        memory[i] <= 32'hDEADBEEF;
     end
 end
 

@@ -42,8 +42,6 @@ module decode(
     /*-----------------------------------*/
 );
 
-parameter RESET_VECTOR = 32'h80000000;
-
 `include "Core.vh"
 
 `include "Instruction_Set.vh"
@@ -52,8 +50,8 @@ parameter RESET_VECTOR = 32'h80000000;
 
 wire stall = ~i_EN;
 
-wire [31:0] instruction = (enterTrap)? NOOP : i_INSTRUCTION;
-wire [6:0]  opcode      = instruction[6:0];
+reg [31:0] instruction;
+wire [6:0]  opcode  = instruction[6:0];
 
 wire isAluReg       = (opcode == ALU_R);
 wire isAluImm       = (opcode == ALU_I);
@@ -127,74 +125,102 @@ wire [31:0] IMM_S   = { {20{instruction[31]}}, instruction[31:25], instruction[1
 wire [31:0] IMM_SFT = { 25'b0, instruction[24:20] };
 wire [31:0] IMM_CSR = { 20'b0, instruction[31:20] };
 
-/* CORE STATE CONTROL */
+/* CORE CONTROL */
 reg  [7:0]  coreState;
 reg  [7:0]  coreStateNext;
-wire        enterTrap = (i_IRQ == 1'b1) && (coreState == USER || coreState == HALT);
-wire        leaveTrap = (isMret == 1'b1) && (coreState == MACHINE);
-wire        halt      = (isWfi == 1'b1);
+
+reg  [31:0] pc;
+reg  [31:0] pc_next;
 
 always @(*) begin
+    coreStateNext = coreState;
     case (coreState)
-    USER : begin
-        coreStateNext <= (enterTrap)? MACHINE : (halt)? HALT : USER;
+    CORE_STATE_EXEC : begin
+        if (i_IRQ) begin
+            coreStateNext = CORE_STATE_TRAP;
+        end
+        else if (isWfi) begin
+            coreStateNext = CORE_STATE_HALT;
+        end
     end
-    MACHINE : begin
-        coreStateNext <= (leaveTrap)? USER : MACHINE;
+    CORE_STATE_TRAP : begin
+        if (isMret) begin
+            coreStateNext = CORE_STATE_EXEC;
+        end
     end
-    HALT    : begin
-        coreStateNext <= (enterTrap)? MACHINE : HALT;
-    end
-    default : begin
-        coreStateNext <= USER;
+    CORE_STATE_HALT : begin
+        if (i_IRQ) begin
+            coreStateNext = CORE_STATE_TRAP;
+        end
     end
     endcase
 end
 
 always @(posedge i_CLK) begin
-    if (~i_RSTn)
-        coreState <= USER;
-    else if (i_EN & i_INSTRUCTION_VALID)
+    if (~i_RSTn) begin
+        coreState <= CORE_STATE_EXEC;
+    end
+    else if (i_EN & i_INSTRUCTION_VALID) begin
         coreState <= coreStateNext;
+    end
 end
 assign o_CORE_STATE = coreState;
 
 
+always @(*) begin
+    instruction = i_INSTRUCTION;
+    if (i_IRQ == 1'b1 && coreState == CORE_STATE_EXEC && coreStateNext == CORE_STATE_TRAP) begin
+        instruction = NOOP;
+    end
+    else if (coreState == CORE_STATE_HALT) begin
+        instruction = NOOP;
+    end
+end
+
 /* PROGRAM COUNTER CONTROL */
-reg  [31:0] pc;
 reg  [31:0] pc_op1;
 reg  [31:0] pc_op2;
-reg  [31:0] pc_next;
 
 always @(*) begin
-    pc_op1 <= (isJalr)? rs1 : pc;
+    pc_op1 = (isJalr)? rs1 : pc;
 end
 
 always @(*) begin : programCounterIncrement
     if (isJal)
-        pc_op2 <= IMM_J;
+        pc_op2 = IMM_J;
     else if (isJalr)
-        pc_op2 <= IMM_R;
+        pc_op2 = IMM_R;
     else if (isFollowed & isBranch)
-        pc_op2 <= IMM_B;
+        pc_op2 = IMM_B;
     else
-        pc_op2 <= 32'd4;
+        pc_op2 = 32'd4;
 end
 
 always @(*) begin : prograCounterNext
-    if (enterTrap)
-        pc_next <= i_MTVEC;
-    else if (leaveTrap)
-        pc_next <= i_MEPC;
-    else
-        pc_next <= pc_op1 + pc_op2;
+    if (coreState == CORE_STATE_EXEC && coreStateNext == CORE_STATE_TRAP) begin
+        pc_next = i_MTVEC;
+    end
+    else if (coreState == CORE_STATE_TRAP && coreStateNext == CORE_STATE_EXEC) begin
+        pc_next = i_MEPC;
+    end
+    else if (coreState == CORE_STATE_HALT) begin
+        if (coreStateNext == CORE_STATE_TRAP)
+            pc_next = i_MTVEC;
+        else
+            pc_next = pc;
+    end
+    else begin
+        pc_next = pc_op1 + pc_op2;
+    end
 end
 
 always @(posedge i_CLK) begin : ProgramPointer
-    if (~i_RSTn)
+    if (~i_RSTn) begin
         pc  <= RESET_VECTOR;
-    else if (i_EN && i_INSTRUCTION_VALID)
+    end
+    else if (i_EN) begin
         pc  <= pc_next;
+    end
 end
 
 assign o_PC = pc;

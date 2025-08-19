@@ -31,11 +31,11 @@ module csr (
 `include "Instruction_Set.vh"
 `include "control_status_registers.vh"
 
-localparam CSR_WRITE = 3'b001;
-localparam CSR_SET   = 3'b010;
-localparam CSR_CLEAR = 3'b011;
+localparam [2:0] CSR_WRITE = 3'b001;
+localparam [2:0] CSR_SET   = 3'b010;
+localparam [2:0] CSR_CLEAR = 3'b011;
 
-wire csrEn   = (i_CORE_STATE == USER); 
+wire csrEn   = (i_CORE_STATE == CORE_STATE_EXEC || i_CORE_STATE == CORE_STATE_HALT); 
 
 wire isWrite = (i_CSR_FUNCT3 == CSR_WRITE) & (i_CSR_FUNCT_EN);
 wire isSet   = (i_CSR_FUNCT3 == CSR_SET)   & (i_CSR_FUNCT_EN);
