@@ -42,10 +42,7 @@ module decode(
     /*-----------------------------------*/
 );
 
-`include "Core.vh"
-
-`include "Instruction_Set.vh"
-
+`include "core.vh"
 `include "control_status_registers.vh"
 
 wire stall = ~i_EN;
@@ -63,10 +60,11 @@ wire isLui          = (opcode == LUI);
 wire isAuipc        = (opcode == AUIPC);
 wire isEcall        = (opcode == ECALL);
 wire isJalr         = (opcode == JALR);
-wire isMret         = (isEcall && (IMM_R == MRET));
+wire isSystem       = (opcode == SYSTEM);
 
 wire isNoop         = (instruction == NOOP);
 wire isWfi          = (instruction == WFI);
+wire isMret         = (instruction == MRET);
 
 wire [2:0] funct3   = instruction[14:12];
 wire [6:0] funct7   = instruction[31:25];

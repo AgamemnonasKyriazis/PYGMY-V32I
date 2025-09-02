@@ -24,8 +24,7 @@ module core (
     input   wire        i_WB_TAGN
 );
 
-`include "Core.vh"
-`include "Instruction_Set.vh"
+`include "core.vh"
 
 /*------------------------------------ CONTROL UNIT ---------------------------------------*/
 wire [7:0]  coreState;

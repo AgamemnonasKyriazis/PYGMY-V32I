@@ -20,7 +20,7 @@ module lsu (
     input   wire        i_LSU_GNT
 );
 
-`include "Core.vh"
+`include "core.vh"
 
 assign o_LSU_WDATA  = i_WDATA;
 assign o_LSU_ADDR   = i_ADDR;

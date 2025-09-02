@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Aug 19 14:27:57 2025
+[*] Mon Sep  1 23:20:25 2025
 [*]
 [dumpfile] "/home/akyriazis/PYGMY-V32I/test/top_tb.vcd"
-[dumpfile_mtime] "Tue Aug 19 14:18:34 2025"
-[dumpfile_size] 73593339
+[dumpfile_mtime] "Mon Sep  1 23:18:14 2025"
+[dumpfile_size] 74411477
 [savefile] "/home/akyriazis/PYGMY-V32I/test/csr.gtkw"
-[timestart] 2387366000
+[timestart] 2387809000
 [size] 2228 1295
-[pos] -208 -10
-*-19.000000 2388823000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -243 -234
+*-19.000000 2388833000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.sys0.
 [treeopen] top_tb.sys0.core0.
@@ -41,8 +41,47 @@ top_tb.sys0.core0.decodeUnit.coreStateNext[7:0]
 @28
 top_tb.sys0.core0.decodeUnit.isMret
 top_tb.sys0.core0.decodeUnit.isNoop
-@29
 top_tb.sys0.core0.decodeUnit.isWfi
+@c00022
+top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+@28
+(0)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(1)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(2)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(3)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(4)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(5)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(6)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(7)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(8)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(9)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(10)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(11)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(12)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(13)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(14)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(15)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(16)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(17)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(18)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(19)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(20)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(21)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(22)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(23)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(24)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(25)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(26)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(27)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(28)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(29)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(30)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+(31)top_tb.sys0.core0.executeUnit.controlStatusRegs.mstatus_0x300[31:0]
+@1401200
+-group_end
+@22
+top_tb.sys0.core0.executeUnit.controlStatusRegs.core_state[7:0]
+top_tb.sys0.core0.executeUnit.controlStatusRegs.core_state_p[7:0]
 @200
 -
 @22
