@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 
-module execute (
+module execute #(
+    parameter [31:0] HART_ID    = 32'h00000000
+) (
     input  wire         i_CLK,
     input  wire         i_RSTn,
     
@@ -136,7 +138,9 @@ lsu loadStoreUnit (
 wire [31:0] CSR_rd;
 wire [11:0] CSR_rd_ptr = i_IMM_VAL[11:0];
 
-csr controlStatusRegs (
+csr #(
+    .HART_ID(HART_ID)
+) controlStatusRegs (
     .i_CLK(i_CLK),
     .i_RSTn(i_RSTn),
     

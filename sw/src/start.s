@@ -3,14 +3,35 @@
 .globl _start
 
 _start:
-    # Load gp
     .option push
 	.option norelax
+
+    # Load gp
     la gp, __global_pointer$
 
+    # Load trap handler base
+    la t0, _MSYSIE
+    csrw mtvec, t0
+
+    # Load hartid
+    csrr a0, mhartid
+
+    # Configure 4kiB stack region
+    li a1, 12
+    # Load sp
+    sll a2, a0, a1
+    la a3, __stack_top$
+    sub sp, a3, a2
+    .option pop
+
+    beq a0, zero, _hart0
+    j _hart1
+
+_hart0:
     la a4, _sdata_load$
     la a5, _sdata$
     la a6, _edata$
+
 _data_copy_loop:
     lw a7, 0(a4)
     sw a7, 0(a5)
@@ -32,23 +53,15 @@ _heap_zero_loop:
     addi a4, a4, 0x04
     blt a4, a5, _heap_zero_loop
 
-    li a4, 0
-    li a5, 0
-    li a6, 0
-
-    .option pop
-
-    # Load sp
-    la sp, __stack_top$
-
-    # Load trap handler base
-    la t0, _MSYSIE
-    csrrw t0, mtvec, t0
-
     call main
+    j _halt
+
 _halt:
     j _halt
 
+_hart1:
+    call main1
+    j _halt
 
 _MSYSIE:
     # Save the context

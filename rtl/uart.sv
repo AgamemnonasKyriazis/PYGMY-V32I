@@ -258,9 +258,9 @@ always_ff @(posedge i_CLK) begin
     end
 end 
 
-always_ff @(posedge tx_clk) begin
-    if (~tx_fifo_empty & tx_state == TX_IDLE)
-        $display("%x \t %c", tx_fifo_data_o, tx_fifo_data_o);
+always @(posedge tx_clk) begin
+    if (tx_fifo_empty == 1'b0 && tx_state == TX_IDLE)
+        $strobe("[%0t] [UART] %0x | %c", $time, tx_fifo_data_o, tx_fifo_data_o);
 end
 
 endmodule

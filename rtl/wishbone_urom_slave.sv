@@ -5,8 +5,11 @@ module wishbone_urom_slave #(
     input  i_RST,
     input  i_CLK,
 
-    input  [ADDR_WIDTH-1:0] i_PC,
-    output logic [DATA_WIDTH-1:0] o_INSTRUCTION,
+    input  [ADDR_WIDTH-1:0] i_PC_0,
+    output logic [DATA_WIDTH-1:0] o_INSTRUCTION_0,
+
+    input  [ADDR_WIDTH-1:0] i_PC_1,
+    output logic [DATA_WIDTH-1:0] o_INSTRUCTION_1,
 
     input  [ADDR_WIDTH-1:0] i_ADDR,
     output logic [DATA_WIDTH-1:0] o_DATA,
@@ -54,8 +57,10 @@ urom #(
 ) block_rom (
     .i_CE(rom_ce),
     .i_CLK(i_CLK),
-    .i_PC(i_PC),
-    .o_INSTRUCTION(o_INSTRUCTION),
+    .i_PC_0(i_PC_0),
+    .o_INSTRUCTION_0(o_INSTRUCTION_0),
+    .i_PC_1(i_PC_1),
+    .o_INSTRUCTION_1(o_INSTRUCTION_1), 
     .i_ADDR(rom_addr),
     .o_RDATA(rom_rdata),
     .o_VALID(rom_valid)

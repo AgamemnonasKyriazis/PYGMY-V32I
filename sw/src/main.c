@@ -8,7 +8,7 @@
 
 #include <hal.h>
 
-const uint8_t const msg[] = "Hello World!";
+const uint8_t const msg[] = "Hello World!\r\n\0";
 
 volatile uart_instance_t* const UART = (uart_instance_t*)(UART_BASE);
 
@@ -22,11 +22,21 @@ __wfi(void)
   asm volatile("wfi");
 }
 
+int main1()
+{
+  uint8_t msg_local [64] = {0};
+  for (int i = 0; msg[i] > 0; i++) {
+    msg_local[i] = msg[i];
+    UART->DATA = msg[i];
+  }
+  return 0;
+}
+
 int main()
 {
   hal_write_csr(mie, (EXT_SYS_I5_IE | EXT_SYS_I0_IE));
   __wfi();
-  UART->DATA = 'b';
+  UART->DATA = 'b' + (uint8_t)hal_read_csr(mhartid);
   return 0;
 }
 

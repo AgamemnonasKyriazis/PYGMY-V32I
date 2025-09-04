@@ -1,7 +1,6 @@
 parameter [31:0] VENDOR_ID  = 32'h00000000;
 parameter [31:0] ARCH_ID    = 32'h00000000;
 parameter [31:0] IMPL_ID    = 32'h00000000;    
-parameter [31:0] HART_ID    = 32'h00000000;
 parameter [31:0] ISA        = 32'h00000000;
 
 localparam [31:0] RESET_VECTOR  = 32'h80000000;

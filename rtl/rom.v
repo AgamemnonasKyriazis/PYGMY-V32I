@@ -73,13 +73,7 @@ end
 
 always @(*) begin
     instr_d <= instr;
-end
-
-always @(*) begin
     instr_q <= instr_d;
-end
-
-always @(*) begin
     o_INSTR_GNT <= 1;//i_INSTR_REQ & ~o_INSTR_GNT;
 end
 

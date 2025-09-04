@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 
-module decode(  
+module decode #(
+    parameter [31:0] HART_ID = 32'h00000000
+) (  
     input wire          i_CLK,
     input wire          i_RSTn,
 
@@ -82,7 +84,7 @@ wire [31:0] rd_i     = i_RD;
 wire        reg_we_i = i_REG_WE;
 
 /* REGISTER FILE */
-regfile registers (
+regfile #(.HART_ID(HART_ID)) registers (
     .i_CLK(i_CLK),
     .i_WE(reg_we_i),
     .i_RD_PTR(rd_ptr_i),

@@ -9,8 +9,11 @@ module urom #(
     input i_CE,
     input i_CLK,
 
-    input [ADDR_WIDTH-1:0] i_PC,
-    output logic [DATA_WIDTH-1:0] o_INSTRUCTION,
+    input [ADDR_WIDTH-1:0] i_PC_0,
+    output logic [DATA_WIDTH-1:0] o_INSTRUCTION_0,
+
+    input [ADDR_WIDTH-1:0] i_PC_1,
+    output logic [DATA_WIDTH-1:0] o_INSTRUCTION_1,
 
     input [ADDR_WIDTH-1:0] i_ADDR,
     output reg [DATA_WIDTH-1:0] o_RDATA,
@@ -36,7 +39,8 @@ always_ff @(posedge i_CLK) begin
 end
 
 always_comb begin
-    o_INSTRUCTION = memory[i_PC];
+    o_INSTRUCTION_0 = memory[i_PC_0];
+    o_INSTRUCTION_1 = memory[i_PC_1];
 end
 
 endmodule

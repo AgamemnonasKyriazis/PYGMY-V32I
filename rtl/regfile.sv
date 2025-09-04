@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 
-module regfile (
+module regfile #(
+    parameter [31:0] HART_ID = 32'h00000000
+) (
     input  logic i_CLK,
 
     input  logic i_WE,
@@ -56,5 +58,9 @@ end
 
 assign o_RS1 = rs1;
 assign o_RS2 = rs2;
+
+always @(registerArray[2]) begin
+    $strobe("[%0t] [HART::%0d] [StackPointer] sp=0x%0h", $time, HART_ID, registerArray[2]);
+end
 
 endmodule

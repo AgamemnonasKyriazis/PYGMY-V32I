@@ -40,6 +40,11 @@ state_t state;
 
 wire valid_request = i_LSU_REQ;
 
+logic [1:0] ptr2;
+logic [DATA_WIDTH-1:0] rdata_byte_00, rdata_byte_01, rdata_byte_10, rdata_byte_11;
+logic [DATA_WIDTH-1:0] rdata_half_00, rdata_half_10;
+logic [DATA_WIDTH-1:0] rdata_word_00;
+
 always_ff @(posedge i_CLK) begin
     if (i_RST) begin
         o_CYC  <= 1'b0;
@@ -150,47 +155,51 @@ always_ff @(posedge i_CLK) begin
     end
 end
 
+assign ptr2 = i_LSU_ADDR[1:0];
+
+assign rdata_word_00 = i_DATA;
+
+assign rdata_half_00 = {{16{i_DATA[15]}}, i_DATA[15:0]};
+assign rdata_half_10 = {{16{i_DATA[31]}}, i_DATA[31:16]};
+
+assign rdata_byte_00 = {{24{i_DATA[7]}},  i_DATA[7:0]};
+assign rdata_byte_01 = {{24{i_DATA[15]}}, i_DATA[15:8]};
+assign rdata_byte_10 = {{24{i_DATA[23]}}, i_DATA[23:16]};
+assign rdata_byte_11 = {{24{i_DATA[31]}}, i_DATA[31:24]};
+
 always_comb begin
     o_LSU_GNT = i_ACK;
     o_TAGN = 1'b0;
+    o_LSU_DATA = 0;
     case (i_LSU_HB)
     WORD : begin
-        o_LSU_DATA = i_DATA;
+        o_LSU_DATA = rdata_word_00;
     end
     HALF : begin
-        case (i_LSU_ADDR[1:0])
+        case (ptr2)
         2'b00 : begin
-            o_LSU_DATA = {{16{i_DATA[15]}}, i_DATA[15:0]};
+            o_LSU_DATA = rdata_half_00;
         end
         2'b10 : begin
-            o_LSU_DATA = {{16{i_DATA[31]}}, i_DATA[31:16]};
-        end
-        default : begin
-            o_LSU_DATA = 0;
+            o_LSU_DATA = rdata_half_10;
         end
         endcase
     end
     BYTE : begin
-        case (i_LSU_ADDR[1:0])
+        case (ptr2)
         2'b00 : begin
-            o_LSU_DATA = {{24{i_DATA[7]}}, i_DATA[7:0]};
+            o_LSU_DATA = rdata_byte_00;
         end
         2'b01 : begin
-            o_LSU_DATA = {{24{i_DATA[15]}}, i_DATA[15:8]};
+            o_LSU_DATA = rdata_byte_01;
         end
         2'b10 : begin
-            o_LSU_DATA = {{24{i_DATA[23]}}, i_DATA[23:16]};
+            o_LSU_DATA = rdata_byte_10;
         end
         2'b11 : begin
-            o_LSU_DATA = {{24{i_DATA[31]}}, i_DATA[31:24]};
-        end
-        default : begin
-            o_LSU_DATA = 0;
+            o_LSU_DATA = rdata_byte_11;
         end
         endcase
-    end
-    default : begin
-        o_LSU_DATA = 0;
     end
     endcase
 end

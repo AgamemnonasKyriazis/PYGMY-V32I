@@ -1,4 +1,6 @@
-module core (
+module core #( 
+    parameter [31:0] HART_ID    = 32'h00000000
+) (
     input   wire        i_CLK,
     input   wire        i_RSTn,
     
@@ -70,7 +72,7 @@ wire [31:0] csr_mepc;
 wire en_decode = ~( (lsu_req) & (~lsu_gnt) );
 wire en_execute = 1'b1;
 
-decode decodeUnit (
+decode #(.HART_ID(HART_ID)) decodeUnit (
     .i_CLK(i_CLK),
     .i_RSTn(i_RSTn),
 
@@ -123,7 +125,7 @@ wire [1:0] lsu_byte_en;
 wire lsu_req;
 wire lsu_gnt;
 
-execute executeUnit (
+execute #(.HART_ID(HART_ID)) executeUnit (
     .i_CLK(i_CLK),
     .i_RSTn(i_RSTn),
 

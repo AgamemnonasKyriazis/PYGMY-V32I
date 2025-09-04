@@ -1,13 +1,13 @@
 # Variables
 CC = riscv64-unknown-elf-gcc
 
-CFLAGS = -march=rv32i_zicsr_zifencei -mabi=ilp32 -Os -I ./src
+CFLAGS = -march=rv32i_zicsr_zifencei -mabi=ilp32 -O0 -I ./src
 
 LDFLAGS = -march=rv32i_zicsr_zifencei -mabi=ilp32 \
 	-specs=nano.specs -specs=nosys.specs \
 	-fno-common -fverbose-asm -nostartfiles -mstrict-align -mcmodel=medany \
 	-fno-builtin -fsigned-char -fdata-sections -ffunction-sections -Wno-unused \
-	-T ./link.ld -Wl,--gc-sections
+	-T ./link.ld -Wl,--gc-sections,-Map=link.map
 
 OBJCOPY = riscv64-unknown-elf-objcopy
 

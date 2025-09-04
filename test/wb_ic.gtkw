@@ -1,0 +1,125 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Wed Sep  3 23:00:09 2025
+[*]
+[dumpfile] "/home/akyriazis/PYGMY-V32I/test/top_tb.vcd"
+[dumpfile_mtime] "Wed Sep  3 22:58:50 2025"
+[dumpfile_size] 7152397
+[savefile] "/home/akyriazis/PYGMY-V32I/test/wb_ic.gtkw"
+[timestart] 0
+[size] 2228 1295
+[pos] -100 -94
+*-22.000000 4130000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top_tb.
+[treeopen] top_tb.sys0.
+[treeopen] top_tb.sys0.core0.
+[treeopen] top_tb.sys0.core1.
+[treeopen] top_tb.uart0.
+[treeopen] top_tb.urom_slave_0.
+[treeopen] top_tb.wb_ic_wrapper.
+[sst_width] 386
+[signals_width] 422
+[sst_expanded] 1
+[sst_vpaned_height] 834
+@28
+top_tb.wb_ic_wrapper.i_CLK
+top_tb.wb_ic_wrapper.i_RST
+@200
+-
+@420
+top_tb.wb_ic_wrapper.wb_ic.m_state
+top_tb.wb_ic_wrapper.wb_ic.s_state
+@22
+top_tb.wb_ic_wrapper.wb_ic.target_index[3:0]
+@420
+top_tb.wb_ic_wrapper.wb_ic.source
+@200
+-
+@28
+top_tb.sys0.wb_m_cyc_0
+top_tb.sys0.wb_m_stb_0
+top_tb.sys0.wb_m_we_0
+@22
+top_tb.sys0.wb_m_sel_0[3:0]
+top_tb.sys0.wb_m_addr_0[31:0]
+top_tb.sys0.wb_m_rdata_0[31:0]
+top_tb.sys0.wb_m_wdata_0[31:0]
+@28
+top_tb.sys0.wb_m_ack_0
+@200
+-
+@28
+top_tb.sys0.wb_s_cyc_0
+top_tb.sys0.wb_s_stb_0
+top_tb.sys0.wb_s_we_0
+@22
+top_tb.sys0.wb_s_sel_0[3:0]
+top_tb.sys0.wb_s_addr_0[31:0]
+top_tb.sys0.wb_s_rdata_0[31:0]
+top_tb.sys0.wb_s_wdata_0[31:0]
+@28
+top_tb.sys0.wb_s_ack_0
+@200
+-
+@28
+top_tb.sys0.wb_s_cyc_1
+top_tb.sys0.wb_s_stb_1
+top_tb.sys0.wb_s_we_1
+@22
+top_tb.sys0.wb_s_sel_1[3:0]
+top_tb.sys0.wb_s_addr_1[31:0]
+top_tb.sys0.wb_s_rdata_1[31:0]
+top_tb.sys0.wb_s_wdata_1[31:0]
+@28
+top_tb.sys0.wb_s_ack_1
+@200
+-
+@28
+top_tb.sys0.wb_s_cyc_2
+top_tb.sys0.wb_s_stb_2
+@22
+top_tb.sys0.wb_s_sel_2[3:0]
+top_tb.sys0.wb_s_addr_2[31:0]
+top_tb.sys0.wb_s_rdata_2[31:0]
+top_tb.sys0.wb_s_wdata_2[31:0]
+@28
+top_tb.sys0.wb_s_ack_2
+@200
+-
+@420
+top_tb.wb_ic_wrapper.wb_ic.target
+@22
+top_tb.wb_ic_wrapper.wb_ic.source_address[31:0]
+top_tb.wb_ic_wrapper.wb_ic.target_address[31:0]
+top_tb.wb_ic_wrapper.wb_ic.o_m_ADDR[95:0]
+@200
+-
+@22
+top_tb.sys0.pc_0[31:0]
+top_tb.sys0.pc_1[31:0]
+@200
+-
+@22
+top_tb.wb_ic_wrapper.i_s_ADDR_1[31:0]
+@28
+top_tb.wb_ic_wrapper.i_s_CYC_1
+@22
+top_tb.wb_ic_wrapper.i_s_DATA_1[31:0]
+top_tb.wb_ic_wrapper.i_s_SEL_1[3:0]
+@28
+top_tb.wb_ic_wrapper.i_s_STB_1
+top_tb.wb_ic_wrapper.i_s_TAGN_1
+top_tb.wb_ic_wrapper.i_s_WE_1
+top_tb.wb_ic_wrapper.o_s_ACK_1
+@22
+top_tb.wb_ic_wrapper.o_s_DATA_1[31:0]
+@28
+top_tb.wb_ic_wrapper.o_s_TAGN_1
+@200
+-
+@28
+top_tb.uart0.i_WE
+@22
+top_tb.uart0.i_DATA[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
