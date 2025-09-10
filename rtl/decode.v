@@ -197,21 +197,23 @@ always @(*) begin : programCounterIncrement
 end
 
 always @(*) begin : prograCounterNext
-    if (coreState == CORE_STATE_EXEC && coreStateNext == CORE_STATE_TRAP) begin
-        pc_next = i_MTVEC;
+    pc_next = pc_op1 + pc_op2;
+    case (coreState)
+    CORE_STATE_EXEC : begin
+        if (i_IRQ)
+            pc_next = i_MTVEC;
     end
-    else if (coreState == CORE_STATE_TRAP && coreStateNext == CORE_STATE_EXEC) begin
-        pc_next = i_MEPC;
+    CORE_STATE_TRAP : begin
+        if (isMret)
+            pc_next = i_MEPC;
     end
-    else if (coreState == CORE_STATE_HALT) begin
-        if (coreStateNext == CORE_STATE_TRAP)
+    CORE_STATE_HALT : begin
+        if (i_IRQ)
             pc_next = i_MTVEC;
         else
             pc_next = pc;
     end
-    else begin
-        pc_next = pc_op1 + pc_op2;
-    end
+    endcase
 end
 
 always @(posedge i_CLK) begin : ProgramPointer

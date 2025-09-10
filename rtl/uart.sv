@@ -242,7 +242,7 @@ always_comb begin
 end
 
 always_comb begin
-    rx_fifo_re = valid_req & (~i_WE);
+    rx_fifo_re = valid_req & (~i_WE) & (i_ADDR[3:2] == 2'b00);
     rx_fifo_we = (rx_state == RX_DONE) & rx_clk;
 
     tx_fifo_re = (tx_state == TX_IDLE) & tx_clk;
@@ -253,8 +253,13 @@ always_ff @(posedge i_CLK) begin
     o_ACK <= 1'b0;
     o_DATA <= 0;
     if (valid_req) begin
+        case (i_ADDR[3:2])
+        2'b00 : o_DATA <= {24'b0, rx_fifo_data_o};
+        2'b01 : o_DATA <= {31'b0, ~rx_fifo_empty};
+        2'b10 : o_DATA <= {31'b0, ~rx_fifo_empty};
+        2'b11 : o_DATA <= {31'b0, ~rx_fifo_empty};
+        endcase
         o_ACK <= valid_req;
-        o_DATA <= {24'b0, rx_fifo_data_o};
     end
 end 
 

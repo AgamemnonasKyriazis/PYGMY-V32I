@@ -70,17 +70,6 @@ logic [MXLEN-1:0] mcycleh_0xB80;       /* cycles high 32-bit */
 
 logic [31:0] csrRd;
 
-logic [7:0] core_state;
-logic [7:0] core_state_p;
-
-always_comb begin
-    core_state = i_CORE_STATE;
-end
-
-always_ff @(posedge i_CLK) begin
-    core_state_p <= core_state;
-end
-
 assign mvendorid_0xf11 = VENDOR_ID;
 assign marchid_0xf12   = ARCH_ID;
 assign mimpid_0xf13    = IMPL_ID;
@@ -178,11 +167,11 @@ always_ff @(posedge i_CLK) begin
         mstatus_0x300 <= 32'b00001000;
     end
     else begin
-        if (core_state_p != CORE_STATE_TRAP && core_state == CORE_STATE_TRAP) begin
+        if (mstatus_0x300[3] == 1'b1 && i_CORE_STATE == CORE_STATE_TRAP) begin
             mstatus_0x300[3] <= 1'b0;
             mstatus_0x300[7] <= mstatus_0x300[3];
         end
-        else if (core_state_p == CORE_STATE_TRAP && core_state == CORE_STATE_EXEC) begin
+        else if (mstatus_0x300[3] == 1'b0 && i_CORE_STATE == CORE_STATE_EXEC) begin
             mstatus_0x300[3] <= mstatus_0x300[7];
             mstatus_0x300[7] <= 1'b0;
         end

@@ -14,7 +14,8 @@
 #define GPIO_BASE       0xC0000000UL
 
 typedef struct uart_instance_t {
-  uint8_t DATA;
+  uint32_t DATA;
+  uint32_t RX_SIZE;
 } uart_instance_t;
 
 typedef struct timer_instance_t {
@@ -41,5 +42,7 @@ typedef union gpio_instance_t {
 extern volatile uart_instance_t* const UART;
 extern volatile timer_instance_t* const TIMER;
 extern volatile gpio_instance_t* const GPIO;
+
+extern volatile uint32_t hw_lock_0;
 
 #endif /* _SYSTEM_ */

@@ -9,6 +9,7 @@ all: build
 
 # Rule to create build directory
 build:
+	cd sw && make clean && make all && cd ..
 	mkdir -p build/synth/reports build/bit
 	vivado -mode batch -nolog -nojournal -source build.tcl
 

@@ -53,7 +53,7 @@ always_comb begin
 end
 
 urom #(
-    .UROM_DEPTH(2048)
+    .UROM_DEPTH(4096)
 ) block_rom (
     .i_CE(rom_ce),
     .i_CLK(i_CLK),
